@@ -1,0 +1,47 @@
+# ── Secrets & environment variables ──────────────────────────────────────────
+.env
+.env.*
+!.env.example
+secrets.py
+secrets.json
+*.secret
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Jupyter Notebooks (checkpoints) ──────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ── Streamlit cache ───────────────────────────────────────────────────────────
+.streamlit/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# ── IDEs ─────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Data & model artifacts (large files) ──────────────────────────────────────
+# Uncomment the lines below if you want to exclude raw data CSVs from git:
+# data/*.csv
+# models/*.csv
