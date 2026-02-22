@@ -193,19 +193,18 @@ def render_genie_chatbot():
             "html": _h.escape(pending).replace("\n", "<br>"),
             "err": False,
         })
-        with st.spinner("Genie is analyzing your query…"):
-            try:
-                resp_html, conv_id = _genie_call(pending, st.session_state.genie_conv_id)
-                st.session_state.genie_conv_id = conv_id
-                st.session_state.genie_history.append(
-                    {"role": "bot", "html": resp_html, "err": False}
-                )
-            except Exception as exc:
-                st.session_state.genie_history.append({
-                    "role": "bot",
-                    "html": f"&#9888;&nbsp;{_h.escape(str(exc))}",
-                    "err": True,
-                })
+        try:
+            resp_html, conv_id = _genie_call(pending, st.session_state.genie_conv_id)
+            st.session_state.genie_conv_id = conv_id
+            st.session_state.genie_history.append(
+                {"role": "bot", "html": resp_html, "err": False}
+            )
+        except Exception as exc:
+            st.session_state.genie_history.append({
+                "role": "bot",
+                "html": f"&#9888;&nbsp;{_h.escape(str(exc))}",
+                "err": True,
+            })
 
     # ── Hidden Streamlit form (offscreen via CSS) ─────────────────────────────
     # JS finds this input by placeholder and triggers it when the user sends.
@@ -254,7 +253,7 @@ def render_genie_chatbot():
     bottom: 28px;
     right: 28px;
     z-index: 2147483647;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Space Mono', monospace;
   }
   #genie-toggle {
     display: flex;
@@ -334,7 +333,7 @@ def render_genie_chatbot():
     background: rgba(74,222,128,0.07); border: 1px solid rgba(74,222,128,0.22);
     border-radius: 22px; padding: 5px 12px; font-size: 0.67rem; color: #94a3b8;
     cursor: pointer; letter-spacing: 0.04em; transition: all 0.2s; white-space: nowrap;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Space Mono', monospace;
   }
   .gchip:hover { background: rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.52); color: #4ade80; }
   #genie-messages {
@@ -362,7 +361,7 @@ def render_genie_chatbot():
   .gbubble .sqlblk {
     background: rgba(0,0,0,0.45); border: 1px solid rgba(74,222,128,0.16); border-radius: 7px;
     padding: 7px 10px; font-size: 0.71rem; color: #86efac; margin-top: 7px;
-    font-family: 'Courier New', Courier, monospace; overflow-x: auto; white-space: pre-wrap;
+    font-family: 'Space Mono', monospace; overflow-x: auto; white-space: pre-wrap;
   }
   .gbubble.gerr { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.28); color: #fca5a5; }
   .genie-tbl-wrap { overflow-x: auto; margin-top: 8px; border-radius: 7px; }
@@ -387,7 +386,7 @@ def render_genie_chatbot():
   #genie-input {
     flex: 1; background: rgba(15,25,45,0.93); border: 1px solid rgba(74,222,128,0.23);
     border-radius: 9px; padding: 10px 14px; color: #e2e8f0; font-size: 0.82rem;
-    font-family: 'Courier New', Courier, monospace; outline: none; transition: border-color 0.2s;
+    font-family: 'Space Mono', monospace; outline: none; transition: border-color 0.2s;
   }
   #genie-input:focus { border-color: rgba(74,222,128,0.58); }
   #genie-input::placeholder { color: #475569; }
@@ -763,7 +762,8 @@ def show_dashboard_page():
         for _, entity in entities.iterrows():
             dot_color = sev_dot.get(entity['severity'], '#64748b')
             entity_items_html += (
-                f'<div class="entity-item">'
+                f'<div class="entity-item" data-lat="{entity["lat"]}" data-lon="{entity["lon"]}"'
+                f' style="cursor:pointer;">'
                 f'<span class="entity-name" style="display:flex;align-items:center;gap:0.5rem;">'
                 f'<span style="width:7px;height:7px;border-radius:50%;background:{dot_color};'
                 f'flex-shrink:0;display:inline-block;"></span>'
@@ -779,6 +779,42 @@ def show_dashboard_page():
             </div>
             {entity_items_html}
         </div>''', unsafe_allow_html=True)
+
+        # JS bridge: hover on an entity item → postMessage to the globe iframe
+        components.html("""<script>
+(function() {
+  function attachHoverListeners() {
+    var pDoc = window.parent.document;
+    var items = pDoc.querySelectorAll('.entity-item[data-lat]');
+    if (!items.length) return false;
+    items.forEach(function(item) {
+      if (item._flyListenerAttached) return;
+      item._flyListenerAttached = true;
+      item.addEventListener('mouseenter', function() {
+        var lat = parseFloat(item.getAttribute('data-lat'));
+        var lng = parseFloat(item.getAttribute('data-lon'));
+        var iframes = pDoc.querySelectorAll('iframe');
+        iframes.forEach(function(iframe) {
+          try {
+            iframe.contentWindow.postMessage(
+              { type: 'crisisGlobeFlyTo', lat: lat, lng: lng }, '*'
+            );
+          } catch(e) {}
+        });
+      });
+    });
+    return true;
+  }
+
+  if (!attachHoverListeners()) {
+    var attempts = 0;
+    var iv = setInterval(function() {
+      attempts++;
+      if (attachHoverListeners() || attempts > 20) clearInterval(iv);
+    }, 300);
+  }
+})();
+</script>""", height=0, scrolling=False)
 
     with col2:
         components.html(create_globe_html(theme_colors), height=800, scrolling=False)

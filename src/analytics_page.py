@@ -44,10 +44,10 @@ def _build_chart_a(df):
         title='Mismatch Leaderboard — Top 10 Overlooked Countries',
         height=420,
         xaxis=dict(**_AXIS_BASE, title='Mismatch Score'),
-        yaxis=dict(**{**_AXIS_BASE, 'tickfont': dict(family='Courier New, monospace', color='#e2e8f0', size=12)}, title=''),
+        yaxis=dict(**{**_AXIS_BASE, 'tickfont': dict(family='Space Mono, monospace', color='#e2e8f0', size=12)}, title=''),
         legend=dict(
             orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
-            font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
+            font=dict(family='Space Mono, monospace', color='#94a3b8', size=11),
         ),
         barmode='overlay',
     )
@@ -102,7 +102,7 @@ def _build_chart_b(df):
     for qx, qy, label, col in quad_labels:
         fig.add_annotation(
             x=qx, y=qy, text=label, showarrow=False,
-            font=dict(family='Courier New, monospace', size=9, color=col),
+            font=dict(family='Space Mono, monospace', size=9, color=col),
             opacity=0.5,
         )
 
@@ -113,7 +113,7 @@ def _build_chart_b(df):
             y=row['Normalized Need Prevalence'],
             text=f"  {row['Country Name']}",
             showarrow=False,
-            font=dict(family='Courier New, monospace', size=9, color='#e2e8f0'),
+            font=dict(family='Space Mono, monospace', size=9, color='#e2e8f0'),
             xanchor='left',
         )
 
@@ -124,7 +124,7 @@ def _build_chart_b(df):
         yaxis=dict(**_AXIS_BASE, title='Need Level (0 = Lowest, 1 = Highest)', range=[-0.05, 1.1]),
         legend=dict(
             orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
-            font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
+            font=dict(family='Space Mono, monospace', color='#94a3b8', size=11),
         ),
     )
     fig.update_layout(**layout)
@@ -172,10 +172,10 @@ def _build_chart_c(sector_df):
             title='Number of People',
             tickformat=',.0s',
         ),
-        yaxis=dict(**{**_AXIS_BASE, 'tickfont': dict(family='Courier New, monospace', color='#e2e8f0', size=12)}, title=''),
+        yaxis=dict(**{**_AXIS_BASE, 'tickfont': dict(family='Space Mono, monospace', color='#e2e8f0', size=12)}, title=''),
         legend=dict(
             orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
-            font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
+            font=dict(family='Space Mono, monospace', color='#94a3b8', size=11),
         ),
         margin=dict(l=12, r=12, t=52, b=16),
     )
@@ -191,7 +191,7 @@ def render_analytics_page():
 
     st.markdown("""
     <div style="padding: 1.2rem 0 0.75rem 0;">
-        <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.75rem;
+        <p style="color:#4ade80; font-family:'Space Mono', monospace; font-size:0.75rem;
                   font-weight:700; letter-spacing:0.22em; text-transform:uppercase; margin:0 0 0.5rem 0;">
             HUMANITARIAN ANALYTICS
         </p>
@@ -212,7 +212,7 @@ def render_analytics_page():
         st.markdown("""
         <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:1rem 2.5rem; padding:0.5rem 0;">
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                <p style="color:#4ade80; font-family:'Space Mono', monospace; font-size:0.7rem;
                           letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Need Prevalence</p>
                 <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     <em>People in Need ÷ Total Population.</em> Measures how deeply a country is affected
@@ -220,7 +220,7 @@ def render_analytics_page():
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                <p style="color:#4ade80; font-family:'Space Mono', monospace; font-size:0.7rem;
                           letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Budget per Person in Need (PIN)</p>
                 <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     <em>Revised Requirements (USD) ÷ People in Need.</em> How many dollars are budgeted for
@@ -228,7 +228,7 @@ def render_analytics_page():
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                <p style="color:#4ade80; font-family:'Space Mono', monospace; font-size:0.7rem;
                           letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Mismatch Score</p>
                 <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     <em>Normalized Need Prevalence − Normalized Budget per PIN.</em> The core metric of this dashboard.
@@ -239,7 +239,7 @@ def render_analytics_page():
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                <p style="color:#4ade80; font-family:'Space Mono', monospace; font-size:0.7rem;
                           letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Severity Quartile</p>
                 <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     Countries are ranked by Need Prevalence and divided into four equal groups:
@@ -251,7 +251,7 @@ def render_analytics_page():
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                <p style="color:#4ade80; font-family:'Space Mono', monospace; font-size:0.7rem;
                           letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Targeting Efficiency</p>
                 <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     <em>People Targeted ÷ People in Need.</em> Values above 1.0 indicate over-targeting
@@ -259,7 +259,7 @@ def render_analytics_page():
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                <p style="color:#4ade80; font-family:'Space Mono', monospace; font-size:0.7rem;
                           letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Sectoral Clusters</p>
                 <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     The UN organizes humanitarian response into thematic "clusters": Food Security, Health,
@@ -285,10 +285,10 @@ def render_analytics_page():
         col.markdown(f"""
         <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(148,163,184,0.1);
                     border-radius:6px; padding:1.1rem 1.3rem; border-left:2px solid rgba(74,222,128,0.5);">
-            <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.67rem;
+            <p style="color:#4ade80; font-family:'Space Mono', monospace; font-size:0.67rem;
                       letter-spacing:0.15em; text-transform:uppercase; margin:0 0 0.35rem 0;">{label}</p>
             <p style="color:#ffffff; font-size:1.8rem; font-weight:300; margin:0 0 0.2rem 0; line-height:1.1;">{value}</p>
-            <p style="color:#475569; font-size:0.76rem; margin:0; font-family:'Courier New',monospace;">{sub}</p>
+            <p style="color:#475569; font-size:0.76rem; margin:0; font-family:'Space Mono', monospace;">{sub}</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -331,12 +331,12 @@ def render_analytics_page():
 
     st.markdown("""
     <div style="border-top:1px solid rgba(148,163,184,0.1); margin-top:1.5rem; padding:1.5rem 0 0.5rem 0;">
-        <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.67rem;
+        <p style="color:#4ade80; font-family:'Space Mono', monospace; font-size:0.67rem;
                   letter-spacing:0.18em; text-transform:uppercase; margin:0 0 1rem 0;">KEY FINDINGS</p>
         <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;">
             <div style="background:rgba(15,23,42,0.5); border:1px solid rgba(148,163,184,0.08);
                         border-left:2px solid rgba(239,68,68,0.5); border-radius:5px; padding:1rem 1.1rem;">
-                <p style="color:#ef4444; font-family:'Courier New',monospace; font-size:0.68rem;
+                <p style="color:#ef4444; font-family:'Space Mono', monospace; font-size:0.68rem;
                           letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.5rem 0;">01 — Overlooked Crises</p>
                 <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7; margin:0;">
                     <span style="color:#e2e8f0; font-weight:500;">Sudan</span> holds the highest Mismatch Score
@@ -349,7 +349,7 @@ def render_analytics_page():
             </div>
             <div style="background:rgba(15,23,42,0.5); border:1px solid rgba(148,163,184,0.08);
                         border-left:2px solid rgba(245,158,11,0.5); border-radius:5px; padding:1rem 1.1rem;">
-                <p style="color:#f59e0b; font-family:'Courier New',monospace; font-size:0.68rem;
+                <p style="color:#f59e0b; font-family:'Space Mono', monospace; font-size:0.68rem;
                           letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.5rem 0;">02 — Targeting Efficiency Gap</p>
                 <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7; margin:0;">
                     <span style="color:#e2e8f0; font-weight:500;">Colombia</span> is the most undertargeted
@@ -362,7 +362,7 @@ def render_analytics_page():
             </div>
             <div style="background:rgba(15,23,42,0.5); border:1px solid rgba(148,163,184,0.08);
                         border-left:2px solid rgba(59,130,246,0.5); border-radius:5px; padding:1rem 1.1rem;">
-                <p style="color:#3b82f6; font-family:'Courier New',monospace; font-size:0.68rem;
+                <p style="color:#3b82f6; font-family:'Space Mono', monospace; font-size:0.68rem;
                           letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.5rem 0;">03 — Funding Paradox</p>
                 <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7; margin:0;">
                     <span style="color:#e2e8f0; font-weight:500;">Somalia</span> — a Critical-severity crisis —

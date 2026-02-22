@@ -57,7 +57,7 @@ def get_main_css(theme_colors):
     return f"""
 <style>
     /* Import Inter font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
     
     /* Main app background and default font */
     .stApp {{
@@ -170,7 +170,7 @@ def get_main_css(theme_colors):
         text-transform: uppercase;
         margin-bottom: 0.25rem;
         margin-top: 0;
-        font-family: 'Courier New', monospace;
+        font-family: 'Space Mono', monospace;
         transition: color 0.3s ease;
     }}
     
@@ -834,7 +834,7 @@ def get_globe_button_css(theme_colors):
 # ── Model pipeline diagram iframe CSS ─────────────────────────────────────────
 PIPELINE_CSS = """
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:transparent;font-family:'Courier New',monospace;padding:14px 4px 10px;}
+body{background:#0a0e1a;font-family:'Space Mono', monospace;padding:14px 4px 32px;}
 .flow{display:flex;align-items:flex-start;gap:0;width:100%;}
 .stage{flex:1;background:rgba(15,23,42,0.85);border-radius:7px;padding:16px 18px;}
 .s1{border:1px solid rgba(74,222,128,0.3);}
@@ -850,9 +850,9 @@ body{background:transparent;font-family:'Courier New',monospace;padding:14px 4px
 .title{color:#e2e8f0;font-size:14px;font-weight:500;margin:0 0 6px 0;font-family:Arial,sans-serif;}
 .desc{color:#64748b;font-size:12px;line-height:1.6;margin:0;}
 .split{flex:1;display:flex;flex-direction:column;gap:10px;}
-.note{color:#475569;font-size:11.5px;line-height:1.6;margin-top:12px;}
-.note span{color:#94a3b8;}
-.hi{color:#e2e8f0;}
+.note{color:#94a3b8;font-size:13px;font-weight:500;line-height:1.7;margin-top:16px;font-family:Arial,sans-serif;}
+.note span{color:#e2e8f0;font-weight:600;}
+.hi{color:#4ade80;font-weight:600;}
 .red{color:#ef4444;}
 """
 
@@ -867,14 +867,14 @@ _ABOUT_CSS_BASE = """
 
   /* ── Hero ── */
   .hero { border-bottom:1px solid rgba(148,163,184,0.1); padding-bottom:2.5rem; margin-bottom:2.5rem; }
-  .eyebrow { color:#4ade80; font-family:'Courier New',monospace; font-size:0.62rem;
+  .eyebrow { color:#4ade80; font-family:'Space Mono', monospace; font-size:0.62rem;
     font-weight:700; letter-spacing:0.22em; text-transform:uppercase; margin-bottom:1rem;
     display:flex; align-items:center; gap:0.6rem; }
   .eyebrow::before { content:''; display:inline-block; width:28px; height:1px; background:#4ade80; }
   h1 { color:#ffffff; font-size:3.2rem; font-weight:300; line-height:1.05;
     letter-spacing:-0.03em; margin-bottom:0.5rem; }
   h1 span { color:#4ade80; }
-  .tagline { color:#64748b; font-family:'Courier New',monospace; font-size:0.78rem;
+  .tagline { color:#64748b; font-family:'Space Mono', monospace; font-size:0.78rem;
     letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1.8rem; }
   .hero-body { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
   .lead { color:#94a3b8; font-size:0.95rem; line-height:1.8; font-weight:300; }
@@ -883,11 +883,11 @@ _ABOUT_CSS_BASE = """
   .stat { background:rgba(15,23,42,0.7); border:1px solid rgba(148,163,184,0.1);
     border-left:2px solid rgba(74,222,128,0.5); border-radius:5px; padding:0.9rem 1.1rem; }
   .stat-value { color:#ffffff; font-size:1.6rem; font-weight:300; line-height:1; margin-bottom:0.2rem; }
-  .stat-label { color:#475569; font-family:'Courier New',monospace; font-size:0.62rem;
+  .stat-label { color:#475569; font-family:'Space Mono', monospace; font-size:0.62rem;
     letter-spacing:0.12em; text-transform:uppercase; }
 
   /* ── Section headings ── */
-  .section-label { color:#4ade80; font-family:'Courier New',monospace; font-size:0.6rem;
+  .section-label { color:#4ade80; font-family:'Space Mono', monospace; font-size:0.6rem;
     letter-spacing:0.2em; text-transform:uppercase; margin-bottom:0.3rem; }
   .section-title { color:#e2e8f0; font-size:1.1rem; font-weight:400; margin-bottom:0.3rem; }
   .section-desc { color:#64748b; font-size:0.82rem; line-height:1.65; margin-bottom:1.5rem; max-width:640px; }
@@ -898,7 +898,7 @@ _ABOUT_CSS_BASE = """
   .feature { background:rgba(15,23,42,0.6); border:1px solid rgba(148,163,184,0.09);
     border-radius:7px; padding:1.3rem 1.4rem; transition:border-color 0.2s; }
   .feature:hover { border-color:rgba(74,222,128,0.2); }
-  .feature-num { color:#4ade80; font-family:'Courier New',monospace; font-size:0.6rem;
+  .feature-num { color:#4ade80; font-family:'Space Mono', monospace; font-size:0.6rem;
     letter-spacing:0.14em; text-transform:uppercase; margin-bottom:0.6rem; }
   .feature h3 { color:#f1f5f9; font-size:0.95rem; font-weight:500; margin-bottom:0.5rem; }
   .feature p { color:#64748b; font-size:0.82rem; line-height:1.65; }
@@ -908,17 +908,17 @@ _ABOUT_CSS_BASE = """
   .data-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
   .data-card { background:rgba(15,23,42,0.5); border:1px solid rgba(148,163,184,0.08);
     border-radius:6px; padding:1rem 1.1rem; }
-  .data-card-label { color:#475569; font-family:'Courier New',monospace; font-size:0.58rem;
+  .data-card-label { color:#475569; font-family:'Space Mono', monospace; font-size:0.58rem;
     letter-spacing:0.14em; text-transform:uppercase; margin-bottom:0.35rem; }
   .data-card-value { color:#cbd5e1; font-size:0.85rem; line-height:1.55; }
 
   /* ── Stack ── */
   .stack-section { margin-top:2rem; }
   .stack-group { margin-bottom:1.2rem; }
-  .stack-group-label { color:#334155; font-family:'Courier New',monospace; font-size:0.6rem;
+  .stack-group-label { color:#334155; font-family:'Space Mono', monospace; font-size:0.6rem;
     letter-spacing:0.14em; text-transform:uppercase; margin-bottom:0.5rem; }
   .stack-row { display:flex; flex-wrap:wrap; gap:0.4rem; }
-  .stack-tag { font-family:'Courier New',monospace; font-size:0.67rem; letter-spacing:0.05em;
+  .stack-tag { font-family:'Space Mono', monospace; font-size:0.67rem; letter-spacing:0.05em;
     color:#64748b; border:1px solid rgba(148,163,184,0.12); border-radius:4px;
     padding:0.22rem 0.6rem; transition:all 0.15s; }
   .stack-tag:hover { border-color:rgba(74,222,128,0.3); color:#4ade80; }
@@ -927,9 +927,9 @@ _ABOUT_CSS_BASE = """
   /* ── Footer ── */
   .footer { margin-top:3rem; padding-top:1.5rem; border-top:1px solid rgba(148,163,184,0.08);
     display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; }
-  .footer-left { color:#334155; font-family:'Courier New',monospace; font-size:0.65rem;
+  .footer-left { color:#334155; font-family:'Space Mono', monospace; font-size:0.65rem;
     letter-spacing:0.1em; }
-  .footer-right { color:#1e293b; font-family:'Courier New',monospace; font-size:0.62rem;
+  .footer-right { color:#1e293b; font-family:'Space Mono', monospace; font-size:0.62rem;
     letter-spacing:0.08em; text-transform:uppercase; }
 """
 

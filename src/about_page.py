@@ -166,6 +166,25 @@ def render_about_page(theme_colors):
   </div>
 
 </div>
+<script>
+  (function() {{
+    function resize() {{
+      var h = document.documentElement.scrollHeight || document.body.scrollHeight;
+      var iframes = window.parent.document.querySelectorAll('iframe');
+      iframes.forEach(function(f) {{
+        try {{
+          if (f.contentDocument === document) {{
+            f.style.height = h + 'px';
+            f.style.minHeight = h + 'px';
+          }}
+        }} catch(e) {{}}
+      }});
+    }}
+    if (document.readyState === 'complete') {{ resize(); }}
+    else {{ window.addEventListener('load', resize); }}
+    setTimeout(resize, 200);
+  }})();
+</script>
 </body>
 </html>"""
-    components.html(about_html, height=2400, scrolling=False)
+    components.html(about_html, height=1580, scrolling=False)

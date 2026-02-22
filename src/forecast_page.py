@@ -70,10 +70,10 @@ def _build_chart_f(df_risk):
         title='Projected Funding Gap by Country — 2026',
         height=420,
         xaxis=dict(**_AXIS_BASE, title='Funding Gap (USD Billion)'),
-        yaxis=dict(**{**_AXIS_BASE, 'tickfont': dict(family='Courier New, monospace', color='#e2e8f0', size=12)}, title=''),
+        yaxis=dict(**{**_AXIS_BASE, 'tickfont': dict(family='Space Mono, monospace', color='#e2e8f0', size=12)}, title=''),
         legend=dict(
             orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
-            font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
+            font=dict(family='Space Mono, monospace', color='#94a3b8', size=11),
         ),
         barmode='overlay',
     )
@@ -117,7 +117,7 @@ def _build_chart_g(df_forecast):
         y=0,
         line=dict(color='rgba(148,163,184,0.2)', width=1, dash='dot'),
         annotation_text='$0 funding',
-        annotation_font=dict(family='Courier New, monospace', size=8, color='rgba(148,163,184,0.4)'),
+        annotation_font=dict(family='Space Mono, monospace', size=8, color='rgba(148,163,184,0.4)'),
         annotation_position='right',
     )
 
@@ -150,7 +150,7 @@ def _build_chart_g(df_forecast):
         yaxis=dict(**_AXIS_BASE, title='Projected Funding (USD Million)'),
         legend=dict(
             orientation='v', yanchor='top', y=1, xanchor='left', x=1.02,
-            font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
+            font=dict(family='Space Mono, monospace', color='#94a3b8', size=11),
             bgcolor='rgba(10,14,26,0.5)',
             bordercolor='rgba(74,222,128,0.1)',
             borderwidth=1,
@@ -169,7 +169,7 @@ def render_forecast_page():
 
     st.markdown(
         '<div style="padding:1.2rem 0 0.75rem 0;">'
-        '<p style="color:#4ade80;font-family:\'Courier New\',monospace;font-size:0.75rem;'
+        "<p style=\"color:#4ade80;font-family:'Space Mono', monospace;font-size:0.75rem;"
         'font-weight:700;letter-spacing:0.22em;text-transform:uppercase;margin:0 0 0.5rem 0;">'
         'PREDICTIVE ANALYSIS</p>'
         '<h2 style="color:#ffffff;font-size:2.6rem;font-weight:300;margin:0 0 0.6rem 0;letter-spacing:-0.02em;">'
@@ -224,7 +224,7 @@ def render_forecast_page():
 <span class="hi">Dependency Ratio</span> and <span class="hi">Cost per Beneficiary</span>
 were the strongest drivers of financial requirements. Population Velocity had a smaller marginal impact in this iteration.</p>
 </body></html>"""
-        components.html(pipeline_html, height=240, scrolling=False)
+        components.html(pipeline_html, height=310, scrolling=False)
 
     total_countries  = df_forecast['iso3'].nunique()
     high_risk_countries = df_risk['iso3'].nunique()
@@ -242,10 +242,10 @@ were the strongest drivers of financial requirements. Population Velocity had a 
         col.markdown(
             f'<div style="background:rgba(15,23,42,0.7);border:1px solid rgba(148,163,184,0.1);'
             f'border-radius:6px;padding:1.1rem 1.3rem;border-left:2px solid rgba(74,222,128,0.5);">'
-            f'<p style="color:#4ade80;font-family:\'Courier New\',monospace;font-size:0.67rem;'
+            f"<p style=\"color:#4ade80;font-family:'Space Mono', monospace;font-size:0.67rem;"
             f'letter-spacing:0.15em;text-transform:uppercase;margin:0 0 0.35rem 0;">{label}</p>'
             f'<p style="color:#ffffff;font-size:1.8rem;font-weight:300;margin:0 0 0.2rem 0;line-height:1.1;">{value}</p>'
-            f'<p style="color:#475569;font-size:0.76rem;margin:0;font-family:\'Courier New\',monospace;">{sub}</p>'
+            f"<p style=\"color:#475569;font-size:0.76rem;margin:0;font-family:'Space Mono', monospace;\">{sub}</p>"
             f'</div>',
             unsafe_allow_html=True,
         )
@@ -278,7 +278,7 @@ were the strongest drivers of financial requirements. Population Velocity had a 
 
     st.markdown(
         '<div style="border-top:1px solid rgba(148,163,184,0.1);margin-top:1.5rem;padding:1.5rem 0 0.5rem 0;">'
-        '<p style="color:#4ade80;font-family:\'Courier New\',monospace;font-size:0.67rem;'
+        "<p style=\"color:#4ade80;font-family:'Space Mono', monospace;font-size:0.67rem;"
         'letter-spacing:0.18em;text-transform:uppercase;margin:0 0 1rem 0;">KEY FORECAST FINDINGS</p>'
         '</div>',
         unsafe_allow_html=True,
@@ -287,7 +287,7 @@ were the strongest drivers of financial requirements. Population Velocity had a 
     fc1.markdown(
         '<div style="background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.08);'
         'border-left:2px solid rgba(239,68,68,0.5);border-radius:5px;padding:1rem 1.1rem;height:100%;">'
-        '<p style="color:#ef4444;font-family:\'Courier New\',monospace;font-size:0.68rem;'
+        "<p style=\"color:#ef4444;font-family:'Space Mono', monospace;font-size:0.68rem;"
         'letter-spacing:0.1em;text-transform:uppercase;margin:0 0 0.5rem 0;">01 &#8212; The Angola Anomaly</p>'
         '<p style="color:#94a3b8;font-size:0.9rem;line-height:1.7;margin:0;">'
         'Angola dominates the high-risk list with a projected 2030 funding gap of '
@@ -300,7 +300,7 @@ were the strongest drivers of financial requirements. Population Velocity had a 
     fc2.markdown(
         '<div style="background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.08);'
         'border-left:2px solid rgba(245,158,11,0.5);border-radius:5px;padding:1rem 1.1rem;height:100%;">'
-        '<p style="color:#f59e0b;font-family:\'Courier New\',monospace;font-size:0.68rem;'
+        "<p style=\"color:#f59e0b;font-family:'Space Mono', monospace;font-size:0.68rem;"
         'letter-spacing:0.1em;text-transform:uppercase;margin:0 0 0.5rem 0;">02 &#8212; Systemic Structural Gap</p>'
         '<p style="color:#94a3b8;font-size:0.9rem;line-height:1.7;margin:0;">'
         '<span style="color:#e2e8f0;font-weight:500;">706 country-year instances</span> (across 141 countries) '
@@ -313,7 +313,7 @@ were the strongest drivers of financial requirements. Population Velocity had a 
     fc3.markdown(
         '<div style="background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.08);'
         'border-left:2px solid rgba(59,130,246,0.5);border-radius:5px;padding:1rem 1.1rem;height:100%;">'
-        '<p style="color:#3b82f6;font-family:\'Courier New\',monospace;font-size:0.68rem;'
+        "<p style=\"color:#3b82f6;font-family:'Space Mono', monospace;font-size:0.68rem;"
         'letter-spacing:0.1em;text-transform:uppercase;margin:0 0 0.5rem 0;">03 &#8212; Data Sparsity Limits Reach</p>'
         '<p style="color:#94a3b8;font-size:0.9rem;line-height:1.7;margin:0;">'
         'Prophet could only generate funding forecasts for '

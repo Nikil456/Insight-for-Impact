@@ -259,6 +259,15 @@ def create_globe_html(theme_colors):
     globe.pointOfView(VIEWS[name], 1000);
     globe.controls().autoRotate = (name === 'world');
   }}
+
+  window.addEventListener('message', function(e) {{
+    if (e.data && e.data.type === 'crisisGlobeFlyTo') {{
+      globe.controls().autoRotate = false;
+      currentView = '';
+      document.querySelectorAll('.vbtn').forEach(b => b.classList.remove('active'));
+      globe.pointOfView({{ lat: e.data.lat, lng: e.data.lng, altitude: 1.2 }}, 900);
+    }}
+  }});
 </script>
 </body>
 </html>"""
