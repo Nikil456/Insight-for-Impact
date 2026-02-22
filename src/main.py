@@ -5,6 +5,21 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 import os
+from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).parent.parent / ".env")
+except ImportError:
+    pass
+
+from styles import APP_CSS, NAV_BUTTON_CSS, GLOBE_CSS, PIPELINE_CSS, ABOUT_CSS
+
+# ── Databricks Genie Configuration ──────────────────────────────────────────
+# Values are loaded from the .env file at the project root (see .gitignore).
+DATABRICKS_HOST  = os.environ.get("DATABRICKS_HOST", "")
+DATABRICKS_TOKEN = os.environ.get("DATABRICKS_TOKEN", "")
+GENIE_SPACE_ID   = os.environ.get("GENIE_SPACE_ID", "")
 
 # ── Session state ──────────────────────────────────────────────────────────────
 if "active_page" not in st.session_state:
@@ -18,146 +33,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS
-st.markdown("""
-<style>
-    .stApp { background-color: #0a0e1a; }
-
-    .block-container {
-        padding-top: 1rem;
-        padding-bottom: 0rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-        max-width: 100%;
-    }
-
-    .element-container { margin: 0 !important; padding: 0 !important; }
-    [data-testid="column"] { padding: 0.5rem !important; }
-    div[data-testid="stHorizontalBlock"] { gap: 1rem !important; }
-
-    .entity-list {
-        background-color: transparent;
-        padding: 0;
-        height: calc(100vh - 200px);
-        min-height: 500px;
-        overflow-y: auto;
-        border: none;
-        margin-top: 0;
-    }
-
-    .entity-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-    }
-
-    .entity-count { color: #4ade80; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; }
-    .sort-dropdown { color: #94a3b8; font-size: 0.875rem; }
-
-    .entity-item {
-        color: #e2e8f0;
-        padding: 1rem 0;
-        margin: 0;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-    }
-
-    .entity-item:hover { color: #ffffff; padding-left: 0.5rem; }
-    .entity-name { font-size: 1.1rem; font-weight: 400; letter-spacing: 0.02em; }
-    .entity-badge { color: #64748b; font-size: 0.9rem; font-weight: 400; min-width: 2rem; text-align: right; }
-
-    .nav-item {
-        color: #64748b;
-        font-size: 0.75rem;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        margin: 0; padding: 0;
-        line-height: 2;
-    }
-    .nav-item.active { color: #4ade80; }
-    .nav-logo { color: #4ade80; font-size: 1.5rem; margin: 0; padding: 0; }
-
-    /* Nav search */
-    .nav-search-wrap { position: relative; display: flex; align-items: center; width: 100%; }
-
-    .nav-search-input {
-        width: 100%;
-        background: rgba(15, 23, 42, 0.85);
-        border: 1px solid rgba(74, 222, 128, 0.2);
-        border-radius: 50px;
-        padding: 0.42rem 3.2rem 0.42rem 1rem;
-        color: #e2e8f0;
-        font-family: 'Courier New', monospace;
-        font-size: 0.72rem;
-        outline: none;
-        caret-color: #4ade80;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        box-sizing: border-box;
-        letter-spacing: 0.02em;
-    }
-    .nav-search-input::placeholder { color: #334155; }
-    .nav-search-input:focus {
-        border-color: rgba(74, 222, 128, 0.5);
-        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.06), 0 0 18px rgba(74, 222, 128, 0.06);
-    }
-
-    .nav-search-btn {
-        position: absolute; right: 5px;
-        background: rgba(74, 222, 128, 0.1);
-        border: 1px solid rgba(74, 222, 128, 0.3);
-        border-radius: 50px;
-        color: #4ade80;
-        font-family: 'Courier New', monospace;
-        font-size: 0.65rem; font-weight: 700;
-        letter-spacing: 0.06em;
-        padding: 0.3rem 0.75rem;
-        cursor: pointer; text-transform: uppercase;
-        transition: all 0.15s; white-space: nowrap;
-    }
-    .nav-search-btn:hover {
-        background: rgba(74, 222, 128, 0.2);
-        border-color: rgba(74, 222, 128, 0.6);
-    }
-
-    /* Nav button reset — handled dynamically in run_app() */
-
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
-    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
-
-    #MainMenu { visibility: hidden; }
-    footer { visibility: hidden; }
-    header { visibility: hidden; }
-
-    .streamlit-expanderHeader {
-        background-color: transparent !important;
-        color: #cbd5e1 !important;
-        font-size: 0.7rem !important;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-weight: 600 !important;
-        padding: 0.3rem 0 !important;
-        border: none !important;
-    }
-    .streamlit-expanderHeader:hover { color: #4ade80 !important; }
-    .streamlit-expanderContent {
-        background-color: rgba(15, 23, 42, 0.8) !important;
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 4px;
-        padding: 0.5rem !important;
-        margin-top: 0.25rem;
-    }
-    details[open] summary svg { transform: rotate(180deg); }
-</style>
-""", unsafe_allow_html=True)
+st.markdown(f"<style>{APP_CSS}</style>", unsafe_allow_html=True)
 
 
 def generate_sample_entities():
@@ -199,33 +75,7 @@ def create_globe_html():
 <html>
 <head>
 <meta charset="utf-8">
-<style>
-  * {{ margin:0; padding:0; box-sizing:border-box; }}
-  html, body {{ width:100%; height:100%; overflow:hidden; background:transparent; }}
-  #globeViz {{ width:100%; height:100%; }}
-  .overlay {{ position:fixed; z-index:100; font-family:'JetBrains Mono','Fira Code',monospace; font-size:10px; }}
-  .glass {{
-    background:rgba(10,14,26,0.75); border:1px solid rgba(74,222,128,0.2);
-    border-radius:6px; backdrop-filter:blur(10px); padding:6px 10px; color:#94b4d4;
-  }}
-  #controls {{ top:14px; left:14px; display:flex; gap:6px; }}
-  .vbtn {{
-    background:rgba(10,14,26,0.75); border:1px solid rgba(74,222,128,0.2);
-    border-radius:5px; padding:4px 12px; color:#94b4d4; cursor:pointer;
-    font-family:'JetBrains Mono',monospace; font-size:10px; transition:all 0.15s;
-  }}
-  .vbtn.active, .vbtn:hover {{ background:rgba(74,222,128,0.15); border-color:rgba(74,222,128,0.5); color:#4ade80; }}
-  #legend {{ bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:15px; }}
-  .leg {{ display:flex; align-items:center; gap:6px; }}
-  .ldot {{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }}
-  .globe-tooltip {{
-    background:rgba(10,14,26,0.9) !important; border:1px solid rgba(74,222,128,0.3) !important;
-    border-radius:5px !important; color:#94b4d4 !important;
-    font-family:'JetBrains Mono',monospace !important; font-size:11px !important;
-    padding:6px 10px !important; pointer-events:none; line-height:1.6;
-  }}
-  .tooltip-name {{ font-weight:700; color:#4ade80; margin-bottom:2px; }}
-</style>
+<style>{GLOBE_CSS}</style>
 </head>
 <body>
 <div id="globeViz"></div>
@@ -319,6 +169,30 @@ def create_globe_html():
 # ── Analytics helpers ──────────────────────────────────────────────────────────
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
+MODELS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'models')
+
+FORECAST_COUNTRY_NAMES = {
+    'AFG': 'Afghanistan', 'AGO': 'Angola', 'BDI': 'Burundi',
+    'BEN': 'Benin', 'BFA': 'Burkina Faso', 'BGD': 'Bangladesh',
+    'CAF': 'Central African Republic', 'CMR': 'Cameroon',
+    'COD': 'DR Congo', 'COG': 'Congo', 'COL': 'Colombia',
+    'DJI': 'Djibouti', 'ECU': 'Ecuador', 'EGY': 'Egypt',
+    'ETH': 'Ethiopia', 'GIN': 'Guinea', 'GMB': 'Gambia',
+    'GTM': 'Guatemala', 'HND': 'Honduras', 'HTI': 'Haiti',
+    'IRN': 'Iran', 'IRQ': 'Iraq', 'JOR': 'Jordan',
+    'KEN': 'Kenya', 'LBN': 'Lebanon', 'LBR': 'Liberia',
+    'LBY': 'Libya', 'LSO': 'Lesotho', 'MLI': 'Mali',
+    'MMR': 'Myanmar', 'MOZ': 'Mozambique', 'MRT': 'Mauritania',
+    'NER': 'Niger', 'NGA': 'Nigeria', 'NPL': 'Nepal',
+    'PAK': 'Pakistan', 'PHL': 'Philippines', 'PRK': 'North Korea',
+    'PSE': 'Palestine', 'RWA': 'Rwanda', 'SDN': 'Sudan',
+    'SEN': 'Senegal', 'SLE': 'Sierra Leone', 'SLV': 'El Salvador',
+    'SOM': 'Somalia', 'SSD': 'South Sudan', 'SYR': 'Syria',
+    'TCD': 'Chad', 'TGO': 'Togo', 'TJK': 'Tajikistan',
+    'TLS': 'Timor-Leste', 'TUR': 'Turkey', 'TZA': 'Tanzania',
+    'UGA': 'Uganda', 'UKR': 'Ukraine', 'VEN': 'Venezuela',
+    'YEM': 'Yemen', 'ZMB': 'Zambia', 'ZWE': 'Zimbabwe',
+}
 
 SEVERITY_ORDER = ['Low', 'Medium', 'High', 'Critical']
 SEVERITY_COLORS = {
@@ -423,6 +297,26 @@ def load_country_metrics():
 
     df['Severity Quartile'] = df['Need Prevalence'].apply(_quartile)
     df['Targeting Efficiency'] = df['Targeted'] / df['In Need']
+    return df
+
+
+@st.cache_data
+def load_forecast_data():
+    path = os.path.join(MODELS_DIR, 'forecast_results_2026_2030.csv')
+    df = pd.read_csv(path)
+    df['iso3'] = df['iso3'].str.strip().str[:3]
+    df = df.drop_duplicates(subset=['iso3', 'year'], keep='first')
+    df['Country'] = df['iso3'].map(FORECAST_COUNTRY_NAMES).fillna(df['iso3'])
+    return df
+
+
+@st.cache_data
+def load_high_risk_data():
+    path = os.path.join(MODELS_DIR, 'high_neglect_risk_2026_2030.csv')
+    df = pd.read_csv(path)
+    df['iso3'] = df['iso3'].str.strip().str[:3]
+    df = df.drop_duplicates(subset=['iso3', 'year'], keep='first')
+    df['Country'] = df['iso3'].map(FORECAST_COUNTRY_NAMES).fillna(df['iso3'])
     return df
 
 
@@ -688,6 +582,156 @@ def _build_chart_e(df):
     return fig
 
 
+def _build_chart_f(df_risk):
+    """Top countries by projected funding gap — 2026, colored by funding type."""
+    df_2026 = df_risk[df_risk['year'] == 2026].copy()
+
+    # Separate into meaningful funding categories
+    df_2026['Funding_Category'] = np.where(
+        df_2026['Predicted_Funding'] < 0, 'Funding Collapse',
+        np.where(df_2026['Predicted_Funding'] == 0, 'No Coverage Data', 'Underfunded')
+    )
+
+    # Prioritise countries with actual Prophet data (non-zero funding)
+    neg = df_2026[df_2026['Predicted_Funding'] < 0].nlargest(8, 'Funding_Gap')
+    pos = df_2026[df_2026['Predicted_Funding'] > 0].nlargest(7, 'Funding_Gap')
+    top15 = pd.concat([neg, pos]).sort_values('Funding_Gap', ascending=True)
+
+    cat_colors = {
+        'Funding Collapse': '#ef4444',
+        'No Coverage Data': '#475569',
+        'Underfunded': '#f59e0b',
+    }
+    colors = [cat_colors[c] for c in top15['Funding_Category']]
+
+    hover = [
+        (
+            f"<b>{country}</b><br>"
+            f"Funding Gap: ${gap/1e9:.2f}B<br>"
+            f"Projected Funding: {'–$'+f'{abs(fund)/1e6:.0f}M' if fund < 0 else '$'+f'{fund/1e6:.0f}M'}<br>"
+            f"Requirements: ${req/1e6:.0f}M<br>"
+            f"Status: {cat}"
+        )
+        for country, gap, fund, req, cat in zip(
+            top15['Country'], top15['Funding_Gap'],
+            top15['Predicted_Funding'], top15['Predicted_Requirements'],
+            top15['Funding_Category'],
+        )
+    ]
+
+    fig = go.Figure(go.Bar(
+        x=top15['Funding_Gap'] / 1e9,
+        y=top15['Country'],
+        orientation='h',
+        marker=dict(color=colors, line=dict(width=0)),
+        hovertemplate='%{customdata}<extra></extra>',
+        customdata=hover,
+        showlegend=False,
+    ))
+
+    for cat, col in cat_colors.items():
+        fig.add_trace(go.Bar(
+            x=[None], y=[None], orientation='h',
+            name=cat, marker=dict(color=col), showlegend=True,
+        ))
+
+    layout = _chart_layout(
+        title='Projected Funding Gap by Country — 2026',
+        xaxis=dict(**_AXIS_BASE, title='Funding Gap (USD Billion)'),
+        yaxis=dict(**_AXIS_BASE, title=''),
+        legend=dict(
+            orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
+            font=dict(family='Courier New, monospace', color='#64748b', size=10),
+        ),
+        barmode='overlay',
+    )
+    fig.update_layout(**layout)
+    return fig
+
+
+def _build_chart_g(df_forecast):
+    """Funding trajectory 2026-2030 for selected high-risk countries."""
+    REQUIREMENTS_M = 567.35
+
+    # Countries with most extreme negative funding trends
+    collapse_isos = (
+        df_forecast[df_forecast['Predicted_Funding'] < 0]
+        .groupby('iso3')['Predicted_Funding'].min()
+        .nsmallest(5).index.tolist()
+    )
+    # Countries with large positive-but-insufficient funding (interesting spread)
+    positive_isos = (
+        df_forecast[df_forecast['Predicted_Funding'] > 100e6]
+        .groupby('iso3')['Predicted_Funding'].mean()
+        .nlargest(4).index.tolist()
+    )
+
+    selected = collapse_isos + positive_isos
+    df_sel = df_forecast[df_forecast['iso3'].isin(selected)]
+
+    palette_collapse = ['#ef4444', '#f97316', '#fb923c', '#fbbf24', '#a78bfa']
+    palette_positive = ['#4ade80', '#34d399', '#38bdf8', '#60a5fa']
+
+    fig = go.Figure()
+
+    # Requirements flat reference line
+    fig.add_trace(go.Scatter(
+        x=[2026, 2027, 2028, 2029, 2030],
+        y=[REQUIREMENTS_M] * 5,
+        mode='lines',
+        name='Required (XGBoost)',
+        line=dict(color='rgba(74,222,128,0.55)', width=2, dash='dot'),
+        hovertemplate='Requirements: $567M per country<extra></extra>',
+    ))
+
+    # Zero reference
+    fig.add_hline(
+        y=0,
+        line=dict(color='rgba(148,163,184,0.2)', width=1, dash='dot'),
+        annotation_text='$0 funding',
+        annotation_font=dict(family='Courier New, monospace', size=8, color='rgba(148,163,184,0.4)'),
+        annotation_position='right',
+    )
+
+    for i, iso3 in enumerate(selected):
+        sub = df_sel[df_sel['iso3'] == iso3].sort_values('year')
+        if sub.empty:
+            continue
+        name = FORECAST_COUNTRY_NAMES.get(iso3, iso3)
+        is_collapse = iso3 in collapse_isos
+        color = palette_collapse[i] if is_collapse else palette_positive[i - len(collapse_isos)]
+
+        fig.add_trace(go.Scatter(
+            x=sub['year'],
+            y=sub['Predicted_Funding'] / 1e6,
+            mode='lines+markers',
+            name=name,
+            line=dict(color=color, width=2),
+            marker=dict(size=5, color=color),
+            hovertemplate=(
+                f'<b>{name}</b><br>'
+                'Year: %{x}<br>'
+                'Projected Funding: $%{y:.0f}M<extra></extra>'
+            ),
+        ))
+
+    layout = _chart_layout(
+        title='Funding Trajectory Forecast — 2026 to 2030',
+        xaxis=dict(**_AXIS_BASE, title='Year', dtick=1, tickformat='d'),
+        yaxis=dict(**_AXIS_BASE, title='Projected Funding (USD Million)'),
+        legend=dict(
+            orientation='v', yanchor='top', y=1, xanchor='left', x=1.02,
+            font=dict(family='Courier New, monospace', color='#64748b', size=9),
+            bgcolor='rgba(10,14,26,0.5)',
+            bordercolor='rgba(74,222,128,0.1)',
+            borderwidth=1,
+        ),
+        margin=dict(l=12, r=130, t=44, b=12),
+    )
+    fig.update_layout(**layout)
+    return fig
+
+
 def _chart_caption(text):
     st.markdown(
         f'<p style="color:#475569; font-size:0.76rem; line-height:1.6; margin: -4px 0 10px 0; '
@@ -916,139 +960,180 @@ def render_analytics_page():
     """, unsafe_allow_html=True)
 
 
+def render_forecast_page():
+    df_forecast = load_forecast_data()
+    df_risk = load_high_risk_data()
+
+    # ── Page header ────────────────────────────────────────────────────────────
+    st.markdown(
+        '<div style="padding:1.2rem 0 0.5rem 0;">'
+        '<p style="color:#4ade80;font-family:\'Courier New\',monospace;font-size:0.65rem;'
+        'font-weight:700;letter-spacing:0.22em;text-transform:uppercase;margin:0 0 0.35rem 0;">'
+        'PREDICTIVE ANALYSIS</p>'
+        '<h2 style="color:#ffffff;font-size:1.6rem;font-weight:300;margin:0 0 0.5rem 0;letter-spacing:-0.01em;">'
+        'Humanitarian Needs &amp; Funding Forecast 2026&#8211;2030</h2>'
+        '<p style="color:#64748b;font-size:0.82rem;max-width:740px;line-height:1.7;margin:0;">'
+        'A two-stage machine-learning pipeline &#8212; combining demographic trend modelling with '
+        'time-series funding forecasts &#8212; to project where human need will outpace available '
+        'resources over the next five years. Results surface '
+        '<span style="color:#e2e8f0;">706 high-neglect-risk country-years</span> '
+        'where funding is on track to cover less than 85% of projected requirements.</p>'
+        '</div>'
+        '<div style="border-top:1px solid rgba(148,163,184,0.1);margin:0.75rem 0 1.25rem 0;"></div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Model pipeline explainer ────────────────────────────────────────────────
+    with st.expander("▸  MODEL ARCHITECTURE — How This Forecast Was Built", expanded=False):
+        pipeline_html = f"""<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>{PIPELINE_CSS}</style></head><body>
+<div class="flow">
+  <div class="stage s1">
+    <p class="label l-green">01 &#8212; Input Data</p>
+    <p class="title">Historical HNO/HRP Records</p>
+    <p class="desc">2000&#8211;2025 &middot; 165 countries<br>People in Need, Requirements,<br>Funding &amp; Population data</p>
+  </div>
+  <div class="arrow">&#8594;</div>
+  <div class="stage s2">
+    <p class="label l-green">02 &#8212; Feature Engineering</p>
+    <p class="title">Demographic Signals</p>
+    <p class="desc">Dependency Ratio<br>Population Velocity<br>Cost per Beneficiary</p>
+  </div>
+  <div class="arrow">&#8594;</div>
+  <div class="split">
+    <div class="stage s3">
+      <p class="label l-purple">Stage A &#8212; Prophet</p>
+      <p class="title">Funding Trend Forecast</p>
+      <p class="desc">Time-series on historical funding.<br>Coverage: 65 / 165 countries<br>(min. 3 data points required)</p>
+    </div>
+    <div class="stage s4b">
+      <p class="label l-amber">Stage B &#8212; XGBoost</p>
+      <p class="title">Needs &amp; Requirements Prediction</p>
+      <p class="desc">Walk-forward validation (train &le;2019).<br>RMSE: 7.66M people &middot; $876M USD</p>
+    </div>
+  </div>
+  <div class="arrow">&#8594;</div>
+  <div class="stage s5">
+    <p class="label l-green">04 &#8212; Forecast Output</p>
+    <p class="title">2026&#8211;2030 Projections</p>
+    <p class="desc">Predicted In Need<br>Requirements (USD)<br>Funding Gap &middot; Risk Flag<br><span class="red">706 high-neglect instances</span></p>
+  </div>
+</div>
+<p class="note">&#9672; &nbsp;<span>Top predictors (XGBoost feature importance):</span>&nbsp;
+<span class="hi">Dependency Ratio</span> and <span class="hi">Cost per Beneficiary</span>
+were the strongest drivers of financial requirements. Population Velocity had a smaller marginal impact in this iteration.</p>
+</body></html>"""
+        components.html(pipeline_html, height=240, scrolling=False)
+
+    # ── Key metrics ─────────────────────────────────────────────────────────────
+    total_countries = df_forecast['iso3'].nunique()
+    high_risk_countries = df_risk['iso3'].nunique()
+    high_risk_instances = len(df_risk)
+    df_risk_2026 = df_risk[df_risk['year'] == 2026]
+    avg_gap_bn = df_risk_2026[df_risk_2026['Predicted_Funding'] != 0]['Funding_Gap'].mean() / 1e9
+
+    s1, s2, s3, s4 = st.columns(4)
+    for col, label, value, sub in [
+        (s1, 'COUNTRIES FORECASTED', str(total_countries), 'unique country projections'),
+        (s2, 'HIGH-NEGLECT COUNTRIES', str(high_risk_countries), 'flagged across all years'),
+        (s3, 'RISK INSTANCES', str(high_risk_instances), 'country-year gaps > 15%'),
+        (s4, 'AVG FUNDING GAP 2026', f'${avg_gap_bn:.2f}B', 'among tracked countries'),
+    ]:
+        col.markdown(
+            f'<div style="background:rgba(15,23,42,0.7);border:1px solid rgba(148,163,184,0.1);'
+            f'border-radius:6px;padding:1rem 1.2rem;border-left:2px solid rgba(74,222,128,0.4);">'
+            f'<p style="color:#4ade80;font-family:\'Courier New\',monospace;font-size:0.6rem;'
+            f'letter-spacing:0.15em;text-transform:uppercase;margin:0 0 0.3rem 0;">{label}</p>'
+            f'<p style="color:#ffffff;font-size:1.4rem;font-weight:300;margin:0 0 0.1rem 0;">{value}</p>'
+            f'<p style="color:#475569;font-size:0.7rem;margin:0;font-family:\'Courier New\',monospace;">{sub}</p>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── Charts F + G ────────────────────────────────────────────────────────────
+    _section_header(
+        'CHART F + G — FORECAST ANALYSIS',
+        'Where Will Funding Fail to Meet Need?',
+        'The left chart ranks countries by their projected 2026 funding gap — the difference between what '
+        'demographics demand and what funding trends predict. Countries in '
+        '<span style="color:#ef4444;">red</span> are experiencing a funding collapse: their '
+        'historical trend has turned negative. The right chart shows how funding trajectories '
+        'evolve from 2026 to 2030 against the flat requirements line, revealing diverging crises.',
+    )
+    col_f, col_g = st.columns(2, gap='medium')
+    with col_f:
+        st.plotly_chart(_build_chart_f(df_risk), use_container_width=True, config={'displayModeBar': False})
+        _chart_caption(
+            'Top 15 high-neglect-risk countries in 2026, ordered by funding gap (USD billion). '
+            'Red = Prophet modelled a declining/negative funding trend. '
+            'Amber = funding exists but is structurally insufficient. Hover for exact figures.'
+        )
+    with col_g:
+        st.plotly_chart(_build_chart_g(df_forecast), use_container_width=True, config={'displayModeBar': False})
+        _chart_caption(
+            "Each line traces a country's projected funding (USD million) from 2026 to 2030. "
+            'The dotted green line marks the $567M requirements threshold. '
+            'Red/orange lines are falling into negative territory — funding is evaporating. '
+            'Green/blue lines show positive but insufficient funding trends.'
+        )
+
+    # ── Key findings — native columns to avoid markdown/grid issues ──────────────
+    st.markdown(
+        '<div style="border-top:1px solid rgba(148,163,184,0.1);margin-top:1.2rem;padding:1.2rem 0 0.5rem 0;">'
+        '<p style="color:#4ade80;font-family:\'Courier New\',monospace;font-size:0.6rem;'
+        'letter-spacing:0.18em;text-transform:uppercase;margin:0 0 0.9rem 0;">KEY FORECAST FINDINGS</p>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    fc1, fc2, fc3 = st.columns(3, gap='medium')
+    fc1.markdown(
+        '<div style="background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.08);'
+        'border-radius:5px;padding:0.9rem 1rem;height:100%;">'
+        '<p style="color:#ef4444;font-family:\'Courier New\',monospace;font-size:0.62rem;'
+        'letter-spacing:0.1em;text-transform:uppercase;margin:0 0 0.4rem 0;">01 &#8212; The Angola Anomaly</p>'
+        '<p style="color:#94a3b8;font-size:0.78rem;line-height:1.6;margin:0;">'
+        'Angola dominates the high-risk list with a projected 2030 funding gap of '
+        '<span style="color:#e2e8f0;">~$1.58 billion</span> &#8212; because Prophet picked up a steep '
+        'historical funding decline and projected it linearly into negative territory, while '
+        'XGBoost-predicted requirements remain constant. This exemplifies a &#8220;funding collapse&#8221; scenario.</p>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    fc2.markdown(
+        '<div style="background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.08);'
+        'border-radius:5px;padding:0.9rem 1rem;height:100%;">'
+        '<p style="color:#f59e0b;font-family:\'Courier New\',monospace;font-size:0.62rem;'
+        'letter-spacing:0.1em;text-transform:uppercase;margin:0 0 0.4rem 0;">02 &#8212; Systemic Structural Gap</p>'
+        '<p style="color:#94a3b8;font-size:0.78rem;line-height:1.6;margin:0;">'
+        '<span style="color:#e2e8f0;">706 country-year instances</span> (across 141 countries) '
+        'show requirements exceeding 115% of projected funding. This is not isolated &#8212; it reflects a '
+        'widening structural disconnect between demographic reality and international aid flows, '
+        'concentrated in Sub-Saharan Africa and Central Asia.</p>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    fc3.markdown(
+        '<div style="background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.08);'
+        'border-radius:5px;padding:0.9rem 1rem;height:100%;">'
+        '<p style="color:#3b82f6;font-family:\'Courier New\',monospace;font-size:0.62rem;'
+        'letter-spacing:0.1em;text-transform:uppercase;margin:0 0 0.4rem 0;">03 &#8212; Data Sparsity Limits Reach</p>'
+        '<p style="color:#94a3b8;font-size:0.78rem;line-height:1.6;margin:0;">'
+        'Prophet could only generate funding forecasts for '
+        '<span style="color:#e2e8f0;">65 of 165 countries</span> &#8212; those with at least 3 '
+        'historical HRP data points. The remaining 100 countries, often the most fragile, '
+        'had no funding trend to extrapolate, underscoring the need for better data '
+        'infrastructure in humanitarian response systems.</p>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+
 def render_about_page():
-    about_html = """<!DOCTYPE html>
+    about_html = f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html, body {
-    width:100%; min-height:100%;
-    background:#0a0e1a;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #e2e8f0;
-  }
-
-  .page {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 4rem 2rem 5rem;
-  }
-
-  .eyebrow {
-    color: #4ade80;
-    font-family: 'Courier New', monospace;
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    margin-bottom: 1.2rem;
-  }
-
-  h1 {
-    color: #ffffff;
-    font-size: 3rem;
-    font-weight: 300;
-    line-height: 1.1;
-    margin-bottom: 0.4rem;
-    letter-spacing: -0.02em;
-  }
-
-  .subtitle {
-    color: #4ade80;
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 2.5rem;
-  }
-
-  .rule {
-    border: none;
-    border-top: 1px solid rgba(148, 163, 184, 0.12);
-    margin-bottom: 2.5rem;
-  }
-
-  .lead {
-    color: #cbd5e1;
-    font-size: 1.05rem;
-    line-height: 1.75;
-    margin-bottom: 1.6rem;
-    font-weight: 300;
-  }
-
-  .lead b { color: #ffffff; font-weight: 500; }
-
-  /* Three-pillar row */
-  .pillars {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-top: 3rem;
-  }
-
-  .pillar {
-    padding: 1.4rem 1.2rem;
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid rgba(148, 163, 184, 0.1);
-    border-radius: 6px;
-    transition: border-color 0.2s;
-  }
-
-  .pillar:hover { border-color: rgba(74, 222, 128, 0.25); }
-
-  .pillar-icon {
-    color: #4ade80;
-    font-family: 'Courier New', monospace;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 0.75rem;
-  }
-
-  .pillar h3 {
-    color: #f1f5f9;
-    font-size: 0.95rem;
-    font-weight: 500;
-    margin-bottom: 0.6rem;
-  }
-
-  .pillar p {
-    color: #64748b;
-    font-size: 0.82rem;
-    line-height: 1.65;
-  }
-
-  /* Stack row */
-  .stack-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 2.5rem;
-  }
-
-  .stack-tag {
-    font-family: 'Courier New', monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.06em;
-    color: #64748b;
-    border: 1px solid rgba(148, 163, 184, 0.12);
-    border-radius: 4px;
-    padding: 0.25rem 0.65rem;
-  }
-
-  .stack-label {
-    font-family: 'Courier New', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #334155;
-    margin-top: 2.5rem;
-    margin-bottom: 0.6rem;
-  }
-</style>
+<style>{ABOUT_CSS}</style>
 </head>
 <body>
 <div class="page">
@@ -1121,48 +1206,577 @@ def render_about_page():
     components.html(about_html, height=820, scrolling=True)
 
 
+# ── Genie Python-side API helpers ────────────────────────────────────────────
+
+def _genie_call(message: str, conversation_id):
+    """
+    Call the Databricks Genie API from Python (server-side, no CORS).
+    Returns (response_html: str, conversation_id: str).
+    """
+    import requests as _rq, time as _t, html as _h
+
+    if not DATABRICKS_HOST or not DATABRICKS_TOKEN or not GENIE_SPACE_ID:
+        raise ValueError("Databricks credentials not configured. Check your .env file.")
+
+    hdrs = {
+        "Authorization": f"Bearer {DATABRICKS_TOKEN}",
+        "Content-Type": "application/json",
+    }
+    base = f"https://{DATABRICKS_HOST}/api/2.0/genie/spaces/{GENIE_SPACE_ID}"
+
+    if conversation_id is None:
+        # POST .../start-conversation → { conversation: {id}, message: {id, status} }
+        r = _rq.post(f"{base}/start-conversation", headers=hdrs,
+                     json={"content": message}, timeout=30)
+        r.raise_for_status()
+        d = r.json()
+        conversation_id = d["conversation"]["id"]
+        msg_id = d["message"]["id"]
+    else:
+        # POST .../conversations/{id}/messages → message object {id, status}
+        r = _rq.post(f"{base}/conversations/{conversation_id}/messages",
+                     headers=hdrs, json={"content": message}, timeout=30)
+        r.raise_for_status()
+        d = r.json()
+        msg_id = d["id"]
+
+    # Poll GET .../messages/{msg_id} until COMPLETED
+    poll_url = f"{base}/conversations/{conversation_id}/messages/{msg_id}"
+    for _ in range(90):
+        _t.sleep(2)
+        pr = _rq.get(poll_url, headers=hdrs, timeout=30)
+        pr.raise_for_status()
+        m = pr.json()
+        if m["status"] == "COMPLETED":
+            return _parse_genie_resp(m), conversation_id
+        if m["status"] == "FAILED":
+            raise RuntimeError(m.get("error") or "Genie processing failed.")
+
+    raise TimeoutError("Genie timed out after 3 minutes. Please retry.")
+
+
+def _parse_genie_resp(msg: dict) -> str:
+    """Convert a COMPLETED Genie message's attachments into display HTML."""
+    import html as _h
+
+    attachments = msg.get("attachments") or []
+    if not attachments:
+        return ("I analyzed your query but found no results. "
+                "Try asking about a specific country, sector, or funding metric.")
+
+    parts = []
+    for att in attachments:
+        # ── Text answer ──────────────────────────────────────────────────────
+        text_content = (att.get("text") or {}).get("content")
+        if text_content:
+            parts.append(_h.escape(text_content).replace("\n", "<br>"))
+
+        # ── Generated SQL / query description ────────────────────────────────
+        query = att.get("query") or {}
+        if query.get("description"):
+            parts.append(f'<em>&#128202;&nbsp;{_h.escape(query["description"])}</em>')
+        if query.get("query"):
+            parts.append(f'<div class="sqlblk">{_h.escape(query["query"])}</div>')
+
+        # ── Table data ────────────────────────────────────────────────────────
+        table = att.get("table")
+        if table:
+            tbl_html = _table_to_html(table)
+            if tbl_html:
+                parts.append(tbl_html)
+
+    return "<br>".join(parts) if parts else "Analysis complete."
+
+
+def _table_to_html(tbl) -> str:
+    """Render a Genie table attachment as a styled HTML table."""
+    import html as _h
+    try:
+        cols = tbl.get("columns") or []
+        rows = tbl.get("rows") or []
+        if not cols or not rows:
+            return ""
+
+        col_names = [
+            c.get("name", str(c)) if isinstance(c, dict) else str(c)
+            for c in cols
+        ]
+        th = "".join(f"<th>{_h.escape(n)}</th>" for n in col_names)
+
+        tbody = []
+        for row in rows[:25]:
+            if isinstance(row, dict):
+                vals = row.get("values") or list(row.values())
+            else:
+                vals = list(row) if hasattr(row, "__iter__") else [str(row)]
+            td = "".join(
+                f"<td>{_h.escape(str(v)) if v is not None else ''}</td>"
+                for v in vals
+            )
+            tbody.append(f"<tr>{td}</tr>")
+
+        if len(rows) > 25:
+            tbody.append(
+                f'<tr><td colspan="{len(col_names)}" '
+                f'style="color:#64748b;text-align:center;font-size:0.68rem;">'
+                f"&hellip;&nbsp;{len(rows) - 25} more rows</td></tr>"
+            )
+
+        return (
+            '<div class="genie-tbl-wrap">'
+            '<table class="genie-tbl">'
+            f"<thead><tr>{th}</tr></thead>"
+            f"<tbody>{''.join(tbody)}</tbody>"
+            "</table></div>"
+        )
+    except Exception:
+        return ""
+
+
+# ── Genie Chatbot Widget ──────────────────────────────────────────────────────
+
+def render_genie_chatbot():
+    """
+    Floating Genie chat widget.
+    - All Genie API calls run server-side in Python (avoids browser CORS).
+    - A CSS-hidden Streamlit form captures the user's message and triggers a rerun.
+    - The JS widget handles display only; it triggers the hidden form on send.
+    - Chat history is stored in st.session_state and baked into the HTML on every render.
+    """
+    import json, html as _h
+
+    # ── Session state ─────────────────────────────────────────────────────────
+    if "genie_history" not in st.session_state:
+        st.session_state.genie_history = []
+    if "genie_conv_id" not in st.session_state:
+        st.session_state.genie_conv_id = None
+
+    # ── Process any pending message (blocking Python API call, no CORS) ──────
+    pending = st.session_state.pop("genie_pending_msg", None)
+    if pending:
+        st.session_state.genie_history.append({
+            "role": "user",
+            "html": _h.escape(pending).replace("\n", "<br>"),
+            "err": False,
+        })
+        with st.spinner("Genie is analyzing your query…"):
+            try:
+                resp_html, conv_id = _genie_call(pending, st.session_state.genie_conv_id)
+                st.session_state.genie_conv_id = conv_id
+                st.session_state.genie_history.append(
+                    {"role": "bot", "html": resp_html, "err": False}
+                )
+            except Exception as exc:
+                st.session_state.genie_history.append({
+                    "role": "bot",
+                    "html": f"&#9888;&nbsp;{_h.escape(str(exc))}",
+                    "err": True,
+                })
+
+    # ── Hidden Streamlit form (offscreen via CSS) ─────────────────────────────
+    # JS finds this input by placeholder and triggers it when the user sends.
+    st.markdown("""
+<style>
+[data-testid="stForm"]:has(input[placeholder="__genie__"]) {
+    position:fixed!important;left:-9999px!important;top:0!important;
+    width:1px!important;height:1px!important;overflow:hidden!important;
+    opacity:0!important;
+}
+[data-testid="stForm"]:has(input[placeholder="__genie__"]) button,
+[data-testid="stForm"]:has(input[placeholder="__genie__"]) input {
+    pointer-events:auto!important;
+}
+</style>""", unsafe_allow_html=True)
+
+    with st.form("__genie_capture__", clear_on_submit=True):
+        captured = st.text_input(
+            "genie", placeholder="__genie__",
+            label_visibility="collapsed", key="genie_capture_input"
+        )
+        do_send = st.form_submit_button("send")
+
+    if do_send and captured.strip():
+        st.session_state.genie_pending_msg = captured.strip()
+        st.rerun()
+
+    # ── Build messages HTML from Python session state ─────────────────────────
+    history_html = ""
+    for msg in st.session_state.genie_history:
+        role      = msg.get("role", "bot")
+        content   = msg.get("html", "")
+        err_class = " gerr" if msg.get("err") else ""
+        ico       = "&#9658;" if role == "user" else "&#9672;"
+        history_html += (
+            f'<div class="gmsg {role}">'
+            f'<div class="gmsg-ico">{ico}</div>'
+            f'<div class="gbubble{err_class}">{content}</div>'
+            f"</div>"
+        )
+
+    # ── CSS ───────────────────────────────────────────────────────────────────
+    css_str = """
+  #genie-widget {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 2147483647;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  #genie-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #0d1f0d 0%, #0a1a1f 100%);
+    border: 1.5px solid rgba(74,222,128,0.65);
+    border-radius: 34px;
+    padding: 14px 24px 14px 18px;
+    cursor: pointer;
+    color: #4ade80;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    box-shadow: 0 0 28px rgba(74,222,128,0.25), 0 6px 28px rgba(0,0,0,0.7);
+    transition: all 0.25s ease;
+    user-select: none;
+    outline: none;
+  }
+  #genie-toggle:hover {
+    background: linear-gradient(135deg, #0f2a0f 0%, #0a2030 100%);
+    border-color: rgba(74,222,128,0.9);
+    box-shadow: 0 0 40px rgba(74,222,128,0.38), 0 8px 36px rgba(0,0,0,0.8);
+    transform: translateY(-2px);
+  }
+  .genie-btn-dot {
+    width: 10px; height: 10px; background: #4ade80; border-radius: 50%;
+    box-shadow: 0 0 9px #4ade80; animation: gpulse 2s infinite; flex-shrink: 0;
+  }
+  @keyframes gpulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.45; transform: scale(0.72); }
+  }
+  #genie-panel {
+    display: none; flex-direction: column;
+    width: 490px; height: 590px;
+    background: rgba(10,14,26,0.98);
+    border: 1px solid rgba(74,222,128,0.32); border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 0 52px rgba(74,222,128,0.15), 0 28px 72px rgba(0,0,0,0.88);
+    margin-bottom: 16px; animation: gslide 0.28s ease; position: relative;
+  }
+  #genie-panel.open { display: flex; }
+  @keyframes gslide {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  #genie-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 17px 19px 15px;
+    background: linear-gradient(135deg, rgba(13,20,36,0.99) 0%, rgba(10,26,20,0.99) 100%);
+    border-bottom: 1px solid rgba(74,222,128,0.18); flex-shrink: 0;
+  }
+  .ghdr-left { display: flex; align-items: center; gap: 12px; }
+  .gavatar {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #0d3321, #0a2030);
+    border: 1px solid rgba(74,222,128,0.55); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; box-shadow: 0 0 14px rgba(74,222,128,0.24); flex-shrink: 0;
+  }
+  .gtname { color: #e2e8f0; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.1em; display: block; }
+  .gtsub  { color: #4ade80; font-size: 0.68rem; letter-spacing: 0.07em; opacity: 0.82; display: block; margin-top: 1px; }
+  .ghdr-status { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: gpulse 2s infinite; }
+  #genie-closebtn {
+    background: none; border: none; color: #475569; cursor: pointer;
+    font-size: 1.18rem; padding: 3px 7px; border-radius: 5px; line-height: 1;
+    transition: color 0.2s; outline: none; margin-left: 8px;
+  }
+  #genie-closebtn:hover { color: #e2e8f0; }
+  #genie-prompts {
+    display: flex; flex-wrap: wrap; gap: 7px; padding: 12px 17px;
+    border-bottom: 1px solid rgba(148,163,184,0.07); flex-shrink: 0;
+  }
+  .gchip {
+    background: rgba(74,222,128,0.07); border: 1px solid rgba(74,222,128,0.22);
+    border-radius: 22px; padding: 5px 12px; font-size: 0.67rem; color: #94a3b8;
+    cursor: pointer; letter-spacing: 0.04em; transition: all 0.2s; white-space: nowrap;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  .gchip:hover { background: rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.52); color: #4ade80; }
+  #genie-messages {
+    flex: 1; overflow-y: auto; padding: 17px;
+    display: flex; flex-direction: column; gap: 14px;
+    scrollbar-width: thin; scrollbar-color: rgba(74,222,128,0.18) transparent;
+  }
+  #genie-messages::-webkit-scrollbar { width: 4px; }
+  #genie-messages::-webkit-scrollbar-track { background: transparent; }
+  #genie-messages::-webkit-scrollbar-thumb { background: rgba(74,222,128,0.2); border-radius: 2px; }
+  .gmsg { display: flex; gap: 9px; max-width: 93%; }
+  .gmsg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .gmsg.bot  { align-self: flex-start; }
+  .gmsg-ico {
+    width: 27px; height: 27px; border-radius: 7px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; margin-top: 2px;
+  }
+  .gmsg.bot  .gmsg-ico { background: linear-gradient(135deg,#0d3321,#0a2030); border: 1px solid rgba(74,222,128,0.38); color: #4ade80; }
+  .gmsg.user .gmsg-ico { background: rgba(74,222,128,0.13); border: 1px solid rgba(74,222,128,0.32); color: #4ade80; }
+  .gbubble { padding: 10px 14px; border-radius: 11px; font-size: 0.82rem; line-height: 1.58; max-width: 100%; word-break: break-word; }
+  .gmsg.bot  .gbubble { background: rgba(15,25,45,0.93); border: 1px solid rgba(74,222,128,0.12); color: #cbd5e1; }
+  .gmsg.user .gbubble { background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.26); color: #e2e8f0; }
+  .gbubble em { color: #4ade80; font-style: normal; font-size: 0.74rem; }
+  .gbubble .sqlblk {
+    background: rgba(0,0,0,0.45); border: 1px solid rgba(74,222,128,0.16); border-radius: 7px;
+    padding: 7px 10px; font-size: 0.71rem; color: #86efac; margin-top: 7px;
+    font-family: 'Courier New', Courier, monospace; overflow-x: auto; white-space: pre-wrap;
+  }
+  .gbubble.gerr { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.28); color: #fca5a5; }
+  .genie-tbl-wrap { overflow-x: auto; margin-top: 8px; border-radius: 7px; }
+  .genie-tbl { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+  .genie-tbl th { background: rgba(74,222,128,0.1); color: #4ade80; padding: 5px 9px; text-align: left; border-bottom: 1px solid rgba(74,222,128,0.2); white-space: nowrap; }
+  .genie-tbl td { color: #94a3b8; padding: 4px 9px; border-bottom: 1px solid rgba(148,163,184,0.07); }
+  .genie-tbl tr:hover td { background: rgba(74,222,128,0.04); }
+  #genie-typing { display: none; align-self: flex-start; align-items: center; gap: 9px; padding: 0 2px; }
+  #genie-typing.on { display: flex; }
+  .gdots { display: flex; gap: 5px; background: rgba(15,25,45,0.93); border: 1px solid rgba(74,222,128,0.12); border-radius: 11px; padding: 10px 15px; }
+  .gdot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; animation: gbounce 1.2s infinite; }
+  .gdot:nth-child(2) { animation-delay: 0.22s; }
+  .gdot:nth-child(3) { animation-delay: 0.44s; }
+  @keyframes gbounce {
+    0%,80%,100% { transform: translateY(0); opacity: 0.32; }
+    40%          { transform: translateY(-7px); opacity: 1; }
+  }
+  #genie-inputrow {
+    display: flex; align-items: center; gap: 9px; padding: 14px 17px;
+    border-top: 1px solid rgba(74,222,128,0.14); background: rgba(8,12,22,0.97); flex-shrink: 0;
+  }
+  #genie-input {
+    flex: 1; background: rgba(15,25,45,0.93); border: 1px solid rgba(74,222,128,0.23);
+    border-radius: 9px; padding: 10px 14px; color: #e2e8f0; font-size: 0.82rem;
+    font-family: 'Courier New', Courier, monospace; outline: none; transition: border-color 0.2s;
+  }
+  #genie-input:focus { border-color: rgba(74,222,128,0.58); }
+  #genie-input::placeholder { color: #475569; }
+  #genie-input:disabled { opacity: 0.5; }
+  #genie-sendbtn {
+    width: 40px; height: 40px; background: linear-gradient(135deg, #166534, #0a2030);
+    border: 1px solid rgba(74,222,128,0.44); border-radius: 9px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s; color: #4ade80; outline: none;
+  }
+  #genie-sendbtn:hover { background: linear-gradient(135deg, #15803d, #0e3040); border-color: rgba(74,222,128,0.75); transform: scale(1.05); }
+  #genie-sendbtn:disabled { opacity: 0.36; cursor: not-allowed; transform: none; }
+"""
+
+    # ── HTML ──────────────────────────────────────────────────────────────────
+    html_str = """
+<div id="genie-widget">
+  <div id="genie-panel">
+    <div id="genie-header">
+      <div class="ghdr-left">
+        <div class="gavatar">&#9672;</div>
+        <div>
+          <span class="gtname">H2C2 GENIE</span>
+          <span class="gtsub">Powered by Databricks AI/BI</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="ghdr-status"></div>
+        <button id="genie-closebtn" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div id="genie-prompts">
+      <span class="gchip">Which regions are most underfunded?</span>
+      <span class="gchip">Top crisis countries by severity</span>
+      <span class="gchip">Funding gap forecast 2026</span>
+      <span class="gchip">High neglect risk countries</span>
+    </div>
+    <div id="genie-messages">
+      <div class="gmsg bot">
+        <div class="gmsg-ico">&#9672;</div>
+        <div class="gbubble">
+          Hello. I&apos;m Genie, your AI assistant for the Humanitarian Health Command Center.<br><br>
+          Ask me anything about crisis regions, funding gaps, severity scores, or forecasts &mdash; I&apos;ll query the live data for you.
+        </div>
+      </div>
+    </div>
+    <div id="genie-typing">
+      <div class="gmsg-ico" style="width:27px;height:27px;border-radius:7px;background:linear-gradient(135deg,#0d3321,#0a2030);border:1px solid rgba(74,222,128,0.38);display:flex;align-items:center;justify-content:center;font-size:13px;color:#4ade80;flex-shrink:0;margin-top:2px;">&#9672;</div>
+      <div class="gdots"><div class="gdot"></div><div class="gdot"></div><div class="gdot"></div></div>
+    </div>
+    <div id="genie-inputrow">
+      <input id="genie-input" type="text" placeholder="Ask about humanitarian data..." maxlength="500" />
+      <button id="genie-sendbtn" title="Send">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <button id="genie-toggle">
+    <div class="genie-btn-dot"></div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    ASK GENIE
+  </button>
+</div>
+"""
+
+    # ── JS: display only — no fetch calls, triggers hidden Streamlit form ─────
+    js_logic = """
+function initGenieWidget(historyHtml) {
+  var pDoc = window.parent.document;
+
+  var panel   = pDoc.getElementById('genie-panel');
+  var toggle  = pDoc.getElementById('genie-toggle');
+  var closeBtn= pDoc.getElementById('genie-closebtn');
+  var msgsEl  = pDoc.getElementById('genie-messages');
+  var typingEl= pDoc.getElementById('genie-typing');
+  var inputEl = pDoc.getElementById('genie-input');
+  var sendBtn = pDoc.getElementById('genie-sendbtn');
+  var chips   = pDoc.querySelectorAll('.gchip');
+
+  // Append conversation history after the welcome message already in the HTML template
+  if (historyHtml && historyHtml.trim()) {
+    msgsEl.insertAdjacentHTML('beforeend', historyHtml);
+    setTimeout(function(){ msgsEl.scrollTop = msgsEl.scrollHeight; }, 30);
+  }
+
+  // Toggle
+  toggle.addEventListener('click', function() {
+    var isOpen = panel.classList.toggle('open');
+    if (isOpen) {
+      setTimeout(function(){ inputEl.focus(); }, 60);
+      setTimeout(function(){ msgsEl.scrollTop = msgsEl.scrollHeight; }, 30);
+    }
+  });
+  closeBtn.addEventListener('click', function() { panel.classList.remove('open'); });
+
+  // Chips
+  chips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      inputEl.value = chip.textContent.trim();
+      panel.classList.add('open');
+      inputEl.focus();
+    });
+  });
+
+  // Send — passes message to Python via hidden Streamlit form
+  inputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); triggerSend(); }
+  });
+  sendBtn.addEventListener('click', triggerSend);
+
+  function triggerSend() {
+    var txt = inputEl.value.trim();
+    if (!txt) return;
+    inputEl.value = '';
+
+    // Optimistic: show user message + typing indicator immediately
+    var userRow = pDoc.createElement('div');
+    userRow.className = 'gmsg user';
+    userRow.innerHTML =
+      '<div class="gmsg-ico">&#9658;</div>' +
+      '<div class="gbubble">' + escHtml(txt) + '</div>';
+    msgsEl.appendChild(userRow);
+    typingEl.classList.add('on');
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+
+    // Disable input while waiting
+    inputEl.disabled = true;
+    sendBtn.disabled = true;
+
+    // Find hidden Streamlit text input by placeholder
+    var hiddenInput = pDoc.querySelector('input[placeholder="__genie__"]');
+    if (!hiddenInput) {
+      typingEl.classList.remove('on');
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      var errRow = pDoc.createElement('div');
+      errRow.className = 'gmsg bot';
+      errRow.innerHTML = '<div class="gmsg-ico">&#9672;</div><div class="gbubble gerr">&#9888; Widget bridge not found. Please refresh the page.</div>';
+      msgsEl.appendChild(errRow);
+      return;
+    }
+
+    // Set value via React native setter (required for Streamlit React inputs)
+    var nativeSetter = Object.getOwnPropertyDescriptor(
+      window.parent.HTMLInputElement.prototype, 'value'
+    ).set;
+    nativeSetter.call(hiddenInput, txt);
+    hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // Walk up DOM to find the Streamlit form container and click its button
+    var el = hiddenInput;
+    while (el && !(el.getAttribute && el.getAttribute('data-testid') === 'stForm')) {
+      el = el.parentElement;
+    }
+    if (el) {
+      var btn = el.querySelector('button');
+      if (btn) btn.click();
+    }
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+}
+"""
+
+    # ── Injector script: always re-injects widget with fresh Python history ───
+    script = f"""<script>
+(function() {{
+  var pDoc = window.parent.document;
+
+  // Preserve open/closed state across rerenders
+  var wasOpen = false;
+  var existingPanel = pDoc.getElementById('genie-panel');
+  if (existingPanel) wasOpen = existingPanel.classList.contains('open');
+
+  // Remove stale widget (to inject fresh history from Python)
+  var old = pDoc.getElementById('genie-widget');
+  if (old) old.remove();
+  var oldCss = pDoc.getElementById('genie-widget-css');
+  if (oldCss) oldCss.remove();
+
+  // Inject CSS
+  var s = pDoc.createElement('style');
+  s.id = 'genie-widget-css';
+  s.textContent = {json.dumps(css_str)};
+  pDoc.head.appendChild(s);
+
+  // Inject HTML
+  var c = pDoc.createElement('div');
+  c.innerHTML = {json.dumps(html_str)};
+  pDoc.body.appendChild(c);
+
+  // Restore open state
+  if (wasOpen) pDoc.getElementById('genie-panel').classList.add('open');
+
+  {js_logic}
+
+  // Pass current chat history (rendered by Python) into the widget
+  initGenieWidget({json.dumps(history_html)});
+}})();
+</script>"""
+
+    components.html(script, height=0, scrolling=False)
+
+
 def run_app():
     page = st.session_state.active_page
 
+    # ── Genie chatbot (persistent on all pages) ───────────────────────────────
+    render_genie_chatbot()
+
     # ── Navigation ────────────────────────────────────────────────────────────
-    # Inject active-state colors per nav button using their keys
-    nav_active_css = ""
-    for nav_key, nav_page in [
-        ("btn_hr", "HEALTH REGIONS"),
-        ("btn_analytics", "ANALYTICS"),
-        ("btn_about", "ABOUT"),
-    ]:
-        color = "#4ade80" if page == nav_page else "#64748b"
-        nav_active_css += f"""
-        div[data-testid="stButton"]:has(> button[data-testid="baseButton-secondary"]#\\ {nav_key}) button,
-        button[key="{nav_key}"] {{ color: {color} !important; }}
-        """
+    st.markdown(f"<style>{NAV_BUTTON_CSS}</style>", unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <style>
-      button[kind="secondary"] {{
-          display: inline-flex !important;
-          background: none !important;
-          border: none !important;
-          box-shadow: none !important;
-          padding: 0 !important;
-          font-size: 0.75rem !important;
-          letter-spacing: 0.1em !important;
-          text-transform: uppercase !important;
-          font-family: 'Courier New', monospace !important;
-          transition: color 0.2s !important;
-          cursor: pointer !important;
-          line-height: 2 !important;
-          min-height: 0 !important;
-          height: auto !important;
-          width: 100% !important;
-      }}
-      button[kind="secondary"]:hover {{ color: #94a3b8 !important; }}
-      div[data-testid="stButton"] {{ margin: 0 !important; padding: 0 !important; }}
-    </style>
-    """, unsafe_allow_html=True)
-
-    nav_cols = st.columns([0.5, 1.5, 1.5, 1.5, 1.5, 1.5, 3])
+    nav_cols = st.columns([0.5, 1.5, 1.5, 1.5, 1.5, 1.5])
 
     with nav_cols[0]:
         st.markdown('<p class="nav-logo">◈</p>', unsafe_allow_html=True)
@@ -1177,7 +1791,13 @@ def run_app():
         st.markdown(f'<style>button[data-testid="baseButton-secondary"][aria-label="HEALTH REGIONS"]{{color:{hr_color}!important}}</style>', unsafe_allow_html=True)
 
     with nav_cols[2]:
-        st.markdown('<p class="nav-item">REGIONAL TARGETS</p>', unsafe_allow_html=True)
+        fc_color = "#4ade80" if page == "FORECAST" else "#64748b"
+        if st.button("FORECAST", key="btn_forecast"):
+            st.session_state.active_page = "FORECAST"
+            st.rerun()
+        if page == "FORECAST":
+            st.markdown('<div style="height:2px;background:#4ade80;border-radius:1px;margin-top:-6px;"></div>', unsafe_allow_html=True)
+        st.markdown(f'<style>button[data-testid="baseButton-secondary"][aria-label="FORECAST"]{{color:{fc_color}!important}}</style>', unsafe_allow_html=True)
 
     with nav_cols[3]:
         st.markdown('<p class="nav-item">FUNDERS</p>', unsafe_allow_html=True)
@@ -1200,36 +1820,15 @@ def run_app():
             st.markdown('<div style="height:2px;background:#4ade80;border-radius:1px;margin-top:-6px;"></div>', unsafe_allow_html=True)
         st.markdown(f'<style>button[data-testid="baseButton-secondary"][aria-label="ABOUT"]{{color:{ab_color}!important}}</style>', unsafe_allow_html=True)
 
-    with nav_cols[6]:
-        st.markdown("""
-        <div class="nav-search-wrap">
-            <input
-                class="nav-search-input"
-                type="text"
-                id="genieSearch"
-                placeholder="Ask the Genie — e.g. Why is South Sudan critical?"
-                autocomplete="off"
-                spellcheck="false"
-            />
-            <button class="nav-search-btn" onclick="genieRun()">Ask ↵</button>
-        </div>
-        <script>
-            function genieRun() {
-                var val = document.getElementById('genieSearch').value.trim();
-                if (!val) return;
-                console.log('Genie query:', val);
-            }
-            document.getElementById('genieSearch').addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') genieRun();
-            });
-        </script>
-        """, unsafe_allow_html=True)
-
     st.markdown("<div style='margin-bottom: 0.5rem;'></div>", unsafe_allow_html=True)
 
     # ── Page routing ──────────────────────────────────────────────────────────
     if page == "ABOUT":
         render_about_page()
+        return
+
+    if page == "FORECAST":
+        render_forecast_page()
         return
 
     if page == "ANALYTICS":
