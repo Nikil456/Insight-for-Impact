@@ -42,11 +42,12 @@ def _build_chart_a(df):
 
     layout = _chart_layout(
         title='Mismatch Leaderboard — Top 10 Overlooked Countries',
+        height=420,
         xaxis=dict(**_AXIS_BASE, title='Mismatch Score'),
-        yaxis=dict(**_AXIS_BASE, title=''),
+        yaxis=dict(**{**_AXIS_BASE, 'tickfont': dict(family='Courier New, monospace', color='#e2e8f0', size=12)}, title=''),
         legend=dict(
             orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
-            font=dict(family='Courier New, monospace', color='#64748b', size=10),
+            font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
         ),
         barmode='overlay',
     )
@@ -118,11 +119,12 @@ def _build_chart_b(df):
 
     layout = _chart_layout(
         title='Overlooked Quadrant — Need vs. Budget Landscape',
+        height=420,
         xaxis=dict(**_AXIS_BASE, title='Funding Level (0 = Lowest, 1 = Highest)', range=[-0.05, 1.1]),
         yaxis=dict(**_AXIS_BASE, title='Need Level (0 = Lowest, 1 = Highest)', range=[-0.05, 1.1]),
         legend=dict(
             orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
-            font=dict(family='Courier New, monospace', color='#64748b', size=10),
+            font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
         ),
     )
     fig.update_layout(**layout)
@@ -163,97 +165,19 @@ def _build_chart_c(sector_df):
 
     layout = _chart_layout(
         title='Sectoral Coverage Gaps — People in Need vs. Targeted',
+        height=440,
         barmode='group',
         xaxis=dict(
             **_AXIS_BASE,
             title='Number of People',
             tickformat=',.0s',
         ),
-        yaxis=dict(**_AXIS_BASE, title=''),
+        yaxis=dict(**{**_AXIS_BASE, 'tickfont': dict(family='Courier New, monospace', color='#e2e8f0', size=12)}, title=''),
         legend=dict(
             orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
-            font=dict(family='Courier New, monospace', color='#64748b', size=10),
+            font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
         ),
-        margin=dict(l=12, r=12, t=44, b=12),
-    )
-    fig.update_layout(**layout)
-    return fig
-
-
-def _build_chart_d(df):
-    fig = go.Figure()
-    for sev in SEVERITY_ORDER:
-        sub = df[df['Severity Quartile'] == sev]['Budget per PIN'].dropna()
-        if sub.empty:
-            continue
-        r, g, b = (int(SEVERITY_COLORS[sev].lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
-        fig.add_trace(go.Box(
-            y=sub,
-            name=sev,
-            marker=dict(color=SEVERITY_COLORS[sev]),
-            line=dict(color=SEVERITY_COLORS[sev]),
-            fillcolor=f'rgba({r},{g},{b},0.2)',
-            boxmean='sd',
-            hovertemplate='Severity: <b>%{x}</b><br>Budget/Person: $%{y:,.0f}<extra></extra>',
-        ))
-
-    layout = _chart_layout(
-        title='Funding Equity Check — Budget per Person in Need by Severity',
-        xaxis=dict(**_AXIS_BASE, title='Severity Quartile', categoryorder='array', categoryarray=SEVERITY_ORDER),
-        yaxis=dict(**_AXIS_BASE, title='Budget per PIN (USD, log scale)', type='log'),
-    )
-    fig.update_layout(**layout)
-    return fig
-
-
-def _build_chart_e(df):
-    size_ref = 2.0 * df['In Need'].max() / (40.0 ** 2)
-
-    fig = go.Figure()
-    for sev in SEVERITY_ORDER:
-        sub = df[df['Severity Quartile'] == sev].copy()
-        if sub.empty:
-            continue
-        fig.add_trace(go.Scatter(
-            x=sub['Targeting Efficiency'],
-            y=sub['Need Prevalence'],
-            mode='markers',
-            name=sev,
-            marker=dict(
-                size=sub['In Need'],
-                sizemode='area',
-                sizeref=size_ref,
-                sizemin=5,
-                color=SEVERITY_COLORS[sev],
-                opacity=0.7,
-                line=dict(width=0.5, color='rgba(255,255,255,0.2)'),
-            ),
-            hovertemplate=(
-                '<b>%{text}</b><br>'
-                'Targeting Efficiency: %{x:.2f}<br>'
-                'Need Prevalence: %{y:.3f}<br>'
-                'People in Need: %{customdata:,.0f}<extra></extra>'
-            ),
-            text=sub['Country Name'],
-            customdata=sub['In Need'],
-        ))
-
-    fig.add_vline(
-        x=1.0,
-        line=dict(color='rgba(74,222,128,0.4)', width=1, dash='dot'),
-        annotation_text='100% targeting',
-        annotation_font=dict(family='Courier New, monospace', size=9, color='rgba(74,222,128,0.6)'),
-        annotation_position='top right',
-    )
-
-    layout = _chart_layout(
-        title='Efficiency vs. Magnitude — Targeting Rate by Crisis Scale',
-        xaxis=dict(**_AXIS_BASE, title='Targeting Efficiency  (Targeted / In Need)'),
-        yaxis=dict(**_AXIS_BASE, title='Need Prevalence  (In Need / Population)'),
-        legend=dict(
-            orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1,
-            font=dict(family='Courier New, monospace', color='#64748b', size=10),
-        ),
+        margin=dict(l=12, r=12, t=52, b=16),
     )
     fig.update_layout(**layout)
     return fig
@@ -266,76 +190,78 @@ def render_analytics_page():
     sector_df = load_sector_benchmarking()
 
     st.markdown("""
-    <div style="padding: 1.2rem 0 0.5rem 0;">
-        <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.65rem;
-                  font-weight:700; letter-spacing:0.22em; text-transform:uppercase; margin:0 0 0.35rem 0;">
+    <div style="padding: 1.2rem 0 0.75rem 0;">
+        <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.75rem;
+                  font-weight:700; letter-spacing:0.22em; text-transform:uppercase; margin:0 0 0.5rem 0;">
             HUMANITARIAN ANALYTICS
         </p>
-        <h2 style="color:#ffffff; font-size:1.6rem; font-weight:300; margin:0 0 0.5rem 0; letter-spacing:-0.01em;">
+        <h2 style="color:#ffffff; font-size:2.6rem; font-weight:300; margin:0 0 0.6rem 0; letter-spacing:-0.02em;">
             Crisis Funding Intelligence
         </h2>
-        <p style="color:#64748b; font-size:0.82rem; max-width:740px; line-height:1.7; margin:0;">
+        <p style="color:#94a3b8; font-size:0.95rem; max-width:780px; line-height:1.75; margin:0;">
             Not all humanitarian crises receive equal attention. These visualizations measure the gap between
-            <span style="color:#e2e8f0;">the severity of human need</span> and
-            <span style="color:#e2e8f0;">the financial resources allocated</span> per person —
+            <span style="color:#e2e8f0; font-weight:500;">the severity of human need</span> and
+            <span style="color:#e2e8f0; font-weight:500;">the financial resources allocated</span> per person —
             surfacing overlooked emergencies that require immediate advocacy and action.
         </p>
     </div>
-    <div style="border-top:1px solid rgba(148,163,184,0.1); margin: 0.75rem 0 1.25rem 0;"></div>
+    <div style="border-top:1px solid rgba(148,163,184,0.1); margin: 0.75rem 0 1.5rem 0;"></div>
     """, unsafe_allow_html=True)
 
     with st.expander("▸  HOW TO READ THIS DASHBOARD — Metric Definitions", expanded=False):
         st.markdown("""
-        <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:0.75rem 2rem; padding:0.25rem 0;">
+        <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:1rem 2.5rem; padding:0.5rem 0;">
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.65rem;
-                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.2rem 0;">Need Prevalence</p>
-                <p style="color:#94a3b8; font-size:0.78rem; line-height:1.6; margin:0 0 0.8rem 0;">
+                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Need Prevalence</p>
+                <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     <em>People in Need ÷ Total Population.</em> Measures how deeply a country is affected
                     relative to its size. A score of 0.8 means 80% of the population requires humanitarian assistance.
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.65rem;
-                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.2rem 0;">Budget per Person in Need (PIN)</p>
-                <p style="color:#94a3b8; font-size:0.78rem; line-height:1.6; margin:0 0 0.8rem 0;">
+                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Budget per Person in Need (PIN)</p>
+                <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     <em>Revised Requirements (USD) ÷ People in Need.</em> How many dollars are budgeted for
                     every person requiring assistance. A low number signals underfunding relative to the scale of need.
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.65rem;
-                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.2rem 0;">Mismatch Score</p>
-                <p style="color:#94a3b8; font-size:0.78rem; line-height:1.6; margin:0 0 0.8rem 0;">
+                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Mismatch Score</p>
+                <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     <em>Normalized Need Prevalence − Normalized Budget per PIN.</em> The core metric of this dashboard.
-                    A <span style="color:#ef4444;">high positive score</span> (near +1) means a country has
+                    A <span style="color:#ef4444; font-weight:500;">high positive score</span> (near +1) means a country has
                     extreme needs but very little funding — it is "overlooked."
-                    A <span style="color:#4ade80;">negative score</span> means funding is proportionally
+                    A <span style="color:#4ade80; font-weight:500;">negative score</span> means funding is proportionally
                     adequate or generous relative to need.
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.65rem;
-                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.2rem 0;">Severity Quartile</p>
-                <p style="color:#94a3b8; font-size:0.78rem; line-height:1.6; margin:0 0 0.8rem 0;">
+                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Severity Quartile</p>
+                <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     Countries are ranked by Need Prevalence and divided into four equal groups:
-                    <span style="color:#3b82f6;">Low</span> · <span style="color:#f59e0b;">Medium</span> ·
-                    <span style="color:#f97316;">High</span> · <span style="color:#ef4444;">Critical</span>.
+                    <span style="color:#3b82f6; font-weight:500;">Low</span> ·
+                    <span style="color:#f59e0b; font-weight:500;">Medium</span> ·
+                    <span style="color:#f97316; font-weight:500;">High</span> ·
+                    <span style="color:#ef4444; font-weight:500;">Critical</span>.
                     This grouping is used to color-code every chart consistently.
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.65rem;
-                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.2rem 0;">Targeting Efficiency</p>
-                <p style="color:#94a3b8; font-size:0.78rem; line-height:1.6; margin:0 0 0.8rem 0;">
+                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Targeting Efficiency</p>
+                <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     <em>People Targeted ÷ People in Need.</em> Values above 1.0 indicate over-targeting
                     (aid reaches more than the estimated need). Values below 1.0 indicate a coverage gap.
                 </p>
             </div>
             <div>
-                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.65rem;
-                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.2rem 0;">Sectoral Clusters</p>
-                <p style="color:#94a3b8; font-size:0.78rem; line-height:1.6; margin:0 0 0.8rem 0;">
+                <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                          letter-spacing:0.12em; text-transform:uppercase; margin:0 0 0.3rem 0;">Sectoral Clusters</p>
+                <p style="color:#94a3b8; font-size:0.88rem; line-height:1.7; margin:0 0 0.8rem 0;">
                     The UN organizes humanitarian response into thematic "clusters": Food Security, Health,
                     Protection, Water &amp; Sanitation, etc. Each cluster has separate funding and targeting
                     plans, which can diverge significantly from the scale of actual need.
@@ -358,11 +284,11 @@ def render_analytics_page():
     ]:
         col.markdown(f"""
         <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(148,163,184,0.1);
-                    border-radius:6px; padding:1rem 1.2rem; border-left:2px solid rgba(74,222,128,0.4);">
-            <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.6rem;
-                      letter-spacing:0.15em; text-transform:uppercase; margin:0 0 0.3rem 0;">{label}</p>
-            <p style="color:#ffffff; font-size:1.4rem; font-weight:300; margin:0 0 0.1rem 0;">{value}</p>
-            <p style="color:#475569; font-size:0.7rem; margin:0; font-family:'Courier New',monospace;">{sub}</p>
+                    border-radius:6px; padding:1.1rem 1.3rem; border-left:2px solid rgba(74,222,128,0.5);">
+            <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.67rem;
+                      letter-spacing:0.15em; text-transform:uppercase; margin:0 0 0.35rem 0;">{label}</p>
+            <p style="color:#ffffff; font-size:1.8rem; font-weight:300; margin:0 0 0.2rem 0; line-height:1.1;">{value}</p>
+            <p style="color:#475569; font-size:0.76rem; margin:0; font-family:'Courier New',monospace;">{sub}</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -403,61 +329,41 @@ def render_analytics_page():
         'Hover for exact numbers and coverage percentage.'
     )
 
-    section_header(
-        'CHART D + E — STRUCTURAL ANALYSIS',
-        'Does Aid Follow the Deepest Need?',
-        'The left chart tests whether funding scales fairly with crisis severity — ideally, Critical crises '
-        'should receive the most money per person. The right chart explores whether high-need countries '
-        'are also being targeted efficiently, or if large crises are being systematically under-reached.',
-    )
-    col_d, col_e = st.columns(2, gap='medium')
-    with col_d:
-        st.plotly_chart(_build_chart_d(df), use_container_width=True, config={'displayModeBar': False})
-        chart_caption(
-            'Each box shows the distribution of Budget per Person in Need (log scale) within a severity group. '
-            'The line inside the box is the median. Ideally the median should rise from Low → Critical, '
-            'but a declining trend reveals structural inequity in how aid is allocated.'
-        )
-    with col_e:
-        st.plotly_chart(_build_chart_e(df), use_container_width=True, config={'displayModeBar': False})
-        chart_caption(
-            'Bubble size = total people in need. X-axis = share of people actually targeted (1.0 = 100%). '
-            'Countries in the upper-left are large crises with low targeting rates — the most urgent gaps. '
-            'The dotted line marks 100% targeting efficiency.'
-        )
-
     st.markdown("""
-    <div style="border-top:1px solid rgba(148,163,184,0.1); margin-top:1.2rem; padding:1.2rem 0;">
-        <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.6rem;
-                  letter-spacing:0.18em; text-transform:uppercase; margin:0 0 0.75rem 0;">KEY FINDINGS</p>
+    <div style="border-top:1px solid rgba(148,163,184,0.1); margin-top:1.5rem; padding:1.5rem 0 0.5rem 0;">
+        <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.67rem;
+                  letter-spacing:0.18em; text-transform:uppercase; margin:0 0 1rem 0;">KEY FINDINGS</p>
         <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;">
             <div style="background:rgba(15,23,42,0.5); border:1px solid rgba(148,163,184,0.08);
-                        border-radius:5px; padding:0.9rem 1rem;">
-                <p style="color:#ef4444; font-family:'Courier New',monospace; font-size:0.62rem;
-                          letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.4rem 0;">01 — Overlooked Crises</p>
-                <p style="color:#94a3b8; font-size:0.78rem; line-height:1.6; margin:0;">
-                    Countries like <span style="color:#e2e8f0;">Sudan</span> and <span style="color:#e2e8f0;">Afghanistan</span>
+                        border-left:2px solid rgba(239,68,68,0.5); border-radius:5px; padding:1rem 1.1rem;">
+                <p style="color:#ef4444; font-family:'Courier New',monospace; font-size:0.68rem;
+                          letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.5rem 0;">01 — Overlooked Crises</p>
+                <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7; margin:0;">
+                    Countries like <span style="color:#e2e8f0; font-weight:500;">Sudan</span> and
+                    <span style="color:#e2e8f0; font-weight:500;">Afghanistan</span>
                     fall into the Critical bracket yet receive disproportionately low funding per person compared to global norms.
                 </p>
             </div>
             <div style="background:rgba(15,23,42,0.5); border:1px solid rgba(148,163,184,0.08);
-                        border-radius:5px; padding:0.9rem 1rem;">
-                <p style="color:#f59e0b; font-family:'Courier New',monospace; font-size:0.62rem;
-                          letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.4rem 0;">02 — Structural Inequity</p>
-                <p style="color:#94a3b8; font-size:0.78rem; line-height:1.6; margin:0;">
-                    Critical severity crises often receive <span style="color:#e2e8f0;">less funding per person ($300 median)</span>
+                        border-left:2px solid rgba(245,158,11,0.5); border-radius:5px; padding:1rem 1.1rem;">
+                <p style="color:#f59e0b; font-family:'Courier New',monospace; font-size:0.68rem;
+                          letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.5rem 0;">02 — Structural Inequity</p>
+                <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7; margin:0;">
+                    Critical severity crises often receive
+                    <span style="color:#e2e8f0; font-weight:500;">less funding per person ($300 median)</span>
                     than Low severity crises ($493 median), suggesting aid does not always follow the deepest needs.
                 </p>
             </div>
             <div style="background:rgba(15,23,42,0.5); border:1px solid rgba(148,163,184,0.08);
-                        border-radius:5px; padding:0.9rem 1rem;">
-                <p style="color:#3b82f6; font-family:'Courier New',monospace; font-size:0.62rem;
-                          letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.4rem 0;">03 — Sectoral Gaps</p>
-                <p style="color:#94a3b8; font-size:0.78rem; line-height:1.6; margin:0;">
-                    While Food Security targets over <span style="color:#e2e8f0;">55% of people in need</span>,
+                        border-left:2px solid rgba(59,130,246,0.5); border-radius:5px; padding:1rem 1.1rem;">
+                <p style="color:#3b82f6; font-family:'Courier New',monospace; font-size:0.68rem;
+                          letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.5rem 0;">03 — Sectoral Gaps</p>
+                <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7; margin:0;">
+                    While Food Security targets over <span style="color:#e2e8f0; font-weight:500;">55% of people in need</span>,
                     the Protection sector — despite the highest global burden — reaches less than 31%.
                 </p>
             </div>
         </div>
     </div>
+    <div style="height:3rem;"></div>
     """, unsafe_allow_html=True)

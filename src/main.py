@@ -631,7 +631,8 @@ def _render_inner_nav(key_suffix: str):
         st.markdown(
             '<div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;'
             'letter-spacing:0.1em;padding-top:0.5rem;text-align:right;white-space:nowrap;">'
-            'built for the UN</div>',
+            'built for the <a href="https://www.un.org/en/" target="_blank" '
+            'style="color:inherit;text-decoration:none;">UN</a></div>',
             unsafe_allow_html=True,
         )
     st.markdown('</div>', unsafe_allow_html=True)
@@ -669,7 +670,8 @@ def show_home_page():
         st.markdown(
             '<div style="color:#9ca3af;font-size:0.75rem;text-transform:uppercase;'
             'letter-spacing:0.1em;padding-top:0.5rem;text-align:right;white-space:nowrap;">'
-            'built for the UN</div>',
+            'built for the <a href="https://www.un.org/en/" target="_blank" '
+            'style="color:inherit;text-decoration:none;">UN</a></div>',
             unsafe_allow_html=True,
         )
     st.markdown('</div>', unsafe_allow_html=True)
@@ -740,22 +742,13 @@ def show_dashboard_page():
     col1, col2 = st.columns([0.7, 3.5])
 
     with col1:
-        col_filter1, col_filter2 = st.columns(2)
-        with col_filter1:
-            with st.expander("TYPES", expanded=False):
-                st.markdown(f"""
-                <div style="color: {theme_colors['entity_text']}; font-size: 0.85rem;">
-                ◈ Health Crisis<br>◈ Nutrition Emergency<br>◈ Water Shortage<br>
-                ◈ Shelter Need<br>◈ Protection Required
-                </div>
-                """, unsafe_allow_html=True)
-        with col_filter2:
-            with st.expander("TARGETS", expanded=False):
-                st.markdown(f"""
-                <div style="color: {theme_colors['entity_text']}; font-size: 0.85rem;">
-                ◈ All Regions<br>◈ Africa<br>◈ Middle East<br>◈ Asia<br>◈ Americas
-                </div>
-                """, unsafe_allow_html=True)
+        with st.expander("TYPES    ▼", expanded=False):
+            st.markdown(f"""
+            <div style="color: {theme_colors['entity_text']}; font-size: 0.85rem; padding-bottom: 0.75rem;">
+            ◈ Health Crisis<br>◈ Nutrition Emergency<br>◈ Water Shortage<br>
+            ◈ Shelter Need<br>◈ Protection Required
+            </div>
+            """, unsafe_allow_html=True)
 
         st.markdown("<div style='margin-bottom: 0.5rem;'></div>", unsafe_allow_html=True)
 
@@ -785,8 +778,21 @@ def show_dashboard_page():
 def run_app():
     page = st.session_state.current_page
 
-    # Genie chatbot is persistent across all pages
-    render_genie_chatbot()
+    # Genie chatbot only on dashboard, analytics, and forecast pages.
+    # On all other pages actively remove any leftover widget from the DOM,
+    # because it is injected directly into window.parent.document and persists
+    # across Streamlit's client-side page switches.
+    if page in ('dashboard', 'analytics', 'forecast'):
+        render_genie_chatbot()
+    else:
+        components.html("""<script>
+(function() {
+  var w = window.parent.document.getElementById('genie-widget');
+  if (w) w.remove();
+  var s = window.parent.document.getElementById('genie-widget-css');
+  if (s) s.remove();
+})();
+</script>""", height=0, scrolling=False)
 
     if page == 'home':
         show_home_page()

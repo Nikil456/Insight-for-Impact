@@ -139,7 +139,7 @@ def get_main_css(theme_colors):
     
     /* Remove default padding */
     .block-container {{
-        padding-top: 1rem;
+        padding-top: 0.25rem;
         padding-bottom: 0rem;
         padding-left: 1rem;
         padding-right: 1rem;
@@ -362,10 +362,20 @@ def get_main_css(theme_colors):
         background: {theme_colors['scrollbar_thumb_hover']};
     }}
     
-    /* Hide streamlit elements */
-    #MainMenu {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
-    header {{visibility: hidden;}}
+    /* Completely remove Streamlit's built-in header bar (Deploy button, hamburger menu) */
+    #MainMenu {{display: none !important;}}
+    footer {{display: none !important;}}
+    header[data-testid="stHeader"] {{display: none !important;}}
+    [data-testid="stDecoration"] {{display: none !important;}}
+    [data-testid="stToolbar"] {{display: none !important;}}
+
+    /* Remove the top padding Streamlit reserves for the now-hidden header */
+    [data-testid="stAppViewContainer"] > section.main {{
+        padding-top: 0 !important;
+    }}
+    [data-testid="stAppViewContainer"] {{
+        padding-top: 0 !important;
+    }}
     
     /* Filter buttons */
     .filter-section {{
@@ -580,13 +590,15 @@ def get_main_css(theme_colors):
 def get_nav_css(theme, wrapper_class='nav-wrapper'):
     """Generate navigation bar CSS with theme support"""
     if theme == 'dark':
-        nav_text = '#9ca3af'  # Light gray for normal text
-        nav_accent = '#00ff41'  # Bright neon green for active/hover
-        nav_hover = '#00ff41'  # Same bright green on hover
-    else:  # light mode - use darker colors for visibility on white background
-        nav_text = '#475569'  # Darker gray for better contrast
+        nav_text = '#9ca3af'
+        nav_accent = '#00ff41'
+        nav_hover = '#00ff41'
+        nav_bg = '#0a0e1a'
+    else:
+        nav_text = '#475569'
         nav_accent = '#2563eb'
         nav_hover = '#1d4ed8'
+        nav_bg = '#f8fafc'
     
     return f"""
 <style>
@@ -595,8 +607,8 @@ def get_nav_css(theme, wrapper_class='nav-wrapper'):
     display: flex !important;
     align-items: center !important;
     gap: 2rem;
-    margin-bottom: 2rem;
-    padding: 1rem 0;
+    margin-bottom: 1rem;
+    padding: 0.25rem 0;
 }}
 
 [data-testid="stHorizontalBlock"]:has(.{wrapper_class}) > div {{
@@ -606,7 +618,8 @@ def get_nav_css(theme, wrapper_class='nav-wrapper'):
     flex: 0 0 auto !important;
 }}
 
-/* NUCLEAR OPTION - Override ALL button states with maximum specificity */
+/* Force every element inside the nav wrapper to match the page background */
+.{wrapper_class} *,
 .{wrapper_class} button,
 .{wrapper_class} button *,
 .{wrapper_class} .stButton button,
@@ -619,8 +632,8 @@ def get_nav_css(theme, wrapper_class='nav-wrapper'):
 .{wrapper_class} .row-widget.stButton button *,
 div.{wrapper_class} button,
 div.{wrapper_class} button * {{
-    background: transparent !important;
-    background-color: transparent !important;
+    background: {nav_bg} !important;
+    background-color: {nav_bg} !important;
     background-image: none !important;
     border: 0px solid transparent !important;
     border-color: transparent !important;
@@ -654,7 +667,7 @@ div.{wrapper_class} button * {{
     white-space: nowrap !important;
 }}
 
-/* Hover state - FORCE GREEN COLOR */
+/* Hover state */
 .{wrapper_class} button:hover,
 .{wrapper_class} button:hover *,
 .{wrapper_class} .stButton button:hover,
@@ -665,8 +678,8 @@ div.{wrapper_class} button * {{
 .{wrapper_class} button[data-testid="baseButton-secondary"]:hover *,
 div.{wrapper_class} button:hover,
 div.{wrapper_class} button:hover * {{
-    background: transparent !important;
-    background-color: transparent !important;
+    background: {nav_bg} !important;
+    background-color: {nav_bg} !important;
     background-image: none !important;
     border: 0px solid transparent !important;
     border-color: transparent !important;
@@ -683,22 +696,26 @@ div.{wrapper_class} button:hover * {{
 .{wrapper_class} button:focus-visible,
 .{wrapper_class} button[kind="secondary"]:focus,
 .{wrapper_class} button[kind="secondary"]:focus-visible {{
-    background: transparent !important;
+    background: {nav_bg} !important;
+    background-color: {nav_bg} !important;
     border: 0px solid transparent !important;
     border-color: transparent !important;
     outline: 0px solid transparent !important;
     outline-color: transparent !important;
     box-shadow: none !important;
     color: {nav_text} !important;
-}}- NO RED HIGHLIGHT */  
+}}
+
+/* Active state — no red highlight */
 .{wrapper_class} button:active,
 .{wrapper_class} button:active *,
 .{wrapper_class} button[kind="secondary"]:active,
 .{wrapper_class} button[kind="secondary"]:active *,
 .{wrapper_class} button[data-testid="baseButton-secondary"]:active,
 .{wrapper_class} button[data-testid="baseButton-secondary"]:active * {{
-    background: transparent !important;
-    background-color: transparent !important;
+    background: {nav_bg} !important;
+    background-color: {nav_bg} !important;
+    background-image: none !important;
     border: 0px solid transparent !important;
     border-color: transparent !important;
     outline: 0px solid transparent !important;
@@ -830,34 +847,77 @@ body{background:transparent;font-family:'Courier New',monospace;padding:14px 4px
 
 # ── About page iframe CSS ──────────────────────────────────────────────────────
 ABOUT_CSS = """
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body {
-    width:100%; min-height:100%;
-    background:#0a0e1a;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #e2e8f0;
-  }
-  .page { max-width:860px; margin:0 auto; padding:4rem 2rem 5rem; }
-  .eyebrow { color:#4ade80; font-family:'Courier New',monospace; font-size:0.65rem;
-    font-weight:600; letter-spacing:0.22em; text-transform:uppercase; margin-bottom:1.2rem; }
-  h1 { color:#ffffff; font-size:3rem; font-weight:300; line-height:1.1;
-    margin-bottom:0.4rem; letter-spacing:-0.02em; }
-  .subtitle { color:#4ade80; font-family:'Courier New',monospace; font-size:0.8rem;
-    letter-spacing:0.12em; text-transform:uppercase; margin-bottom:2.5rem; }
-  .rule { border:none; border-top:1px solid rgba(148,163,184,0.12); margin-bottom:2.5rem; }
-  .lead { color:#cbd5e1; font-size:1.05rem; line-height:1.75; margin-bottom:1.6rem; font-weight:300; }
-  .lead b { color:#ffffff; font-weight:500; }
-  .pillars { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:3rem; }
-  .pillar { padding:1.4rem 1.2rem; background:rgba(15,23,42,0.7);
-    border:1px solid rgba(148,163,184,0.1); border-radius:6px; transition:border-color 0.2s; }
-  .pillar:hover { border-color:rgba(74,222,128,0.25); }
-  .pillar-icon { color:#4ade80; font-family:'Courier New',monospace; font-size:0.65rem;
-    font-weight:700; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.75rem; }
-  .pillar h3 { color:#f1f5f9; font-size:0.95rem; font-weight:500; margin-bottom:0.6rem; }
-  .pillar p { color:#64748b; font-size:0.82rem; line-height:1.65; }
-  .stack-row { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:2.5rem; }
-  .stack-tag { font-family:'Courier New',monospace; font-size:0.68rem; letter-spacing:0.06em;
-    color:#64748b; border:1px solid rgba(148,163,184,0.12); border-radius:4px; padding:0.25rem 0.65rem; }
-  .stack-label { font-family:'Courier New',monospace; font-size:0.65rem; letter-spacing:0.12em;
-    text-transform:uppercase; color:#334155; margin-top:2.5rem; margin-bottom:0.6rem; }
+  html, body { width:100%; min-height:100%; background:#0a0e1a;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:#e2e8f0; }
+
+  .page { max-width:960px; margin:0 auto; padding:3rem 2.5rem 6rem; }
+
+  /* ── Hero ── */
+  .hero { border-bottom:1px solid rgba(148,163,184,0.1); padding-bottom:2.5rem; margin-bottom:2.5rem; }
+  .eyebrow { color:#4ade80; font-family:'Courier New',monospace; font-size:0.62rem;
+    font-weight:700; letter-spacing:0.22em; text-transform:uppercase; margin-bottom:1rem;
+    display:flex; align-items:center; gap:0.6rem; }
+  .eyebrow::before { content:''; display:inline-block; width:28px; height:1px; background:#4ade80; }
+  h1 { color:#ffffff; font-size:3.2rem; font-weight:300; line-height:1.05;
+    letter-spacing:-0.03em; margin-bottom:0.5rem; }
+  h1 span { color:#4ade80; }
+  .tagline { color:#64748b; font-family:'Courier New',monospace; font-size:0.78rem;
+    letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1.8rem; }
+  .hero-body { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
+  .lead { color:#94a3b8; font-size:0.95rem; line-height:1.8; font-weight:300; }
+  .lead b { color:#e2e8f0; font-weight:500; }
+  .stat-row { display:flex; flex-direction:column; gap:1rem; }
+  .stat { background:rgba(15,23,42,0.7); border:1px solid rgba(148,163,184,0.1);
+    border-left:2px solid rgba(74,222,128,0.5); border-radius:5px; padding:0.9rem 1.1rem; }
+  .stat-value { color:#ffffff; font-size:1.6rem; font-weight:300; line-height:1; margin-bottom:0.2rem; }
+  .stat-label { color:#475569; font-family:'Courier New',monospace; font-size:0.62rem;
+    letter-spacing:0.12em; text-transform:uppercase; }
+
+  /* ── Section headings ── */
+  .section-label { color:#4ade80; font-family:'Courier New',monospace; font-size:0.6rem;
+    letter-spacing:0.2em; text-transform:uppercase; margin-bottom:0.3rem; }
+  .section-title { color:#e2e8f0; font-size:1.1rem; font-weight:400; margin-bottom:0.3rem; }
+  .section-desc { color:#64748b; font-size:0.82rem; line-height:1.65; margin-bottom:1.5rem; max-width:640px; }
+  .divider { border:none; border-top:1px solid rgba(148,163,184,0.08); margin:2.5rem 0; }
+
+  /* ── Feature cards ── */
+  .features { display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-bottom:0.5rem; }
+  .feature { background:rgba(15,23,42,0.6); border:1px solid rgba(148,163,184,0.09);
+    border-radius:7px; padding:1.3rem 1.4rem; transition:border-color 0.2s; }
+  .feature:hover { border-color:rgba(74,222,128,0.2); }
+  .feature-num { color:#4ade80; font-family:'Courier New',monospace; font-size:0.6rem;
+    letter-spacing:0.14em; text-transform:uppercase; margin-bottom:0.6rem; }
+  .feature h3 { color:#f1f5f9; font-size:0.95rem; font-weight:500; margin-bottom:0.5rem; }
+  .feature p { color:#64748b; font-size:0.82rem; line-height:1.65; }
+  .feature p b { color:#94a3b8; font-weight:500; }
+
+  /* ── Data section ── */
+  .data-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+  .data-card { background:rgba(15,23,42,0.5); border:1px solid rgba(148,163,184,0.08);
+    border-radius:6px; padding:1rem 1.1rem; }
+  .data-card-label { color:#475569; font-family:'Courier New',monospace; font-size:0.58rem;
+    letter-spacing:0.14em; text-transform:uppercase; margin-bottom:0.35rem; }
+  .data-card-value { color:#cbd5e1; font-size:0.85rem; line-height:1.55; }
+
+  /* ── Stack ── */
+  .stack-section { margin-top:2rem; }
+  .stack-group { margin-bottom:1.2rem; }
+  .stack-group-label { color:#334155; font-family:'Courier New',monospace; font-size:0.6rem;
+    letter-spacing:0.14em; text-transform:uppercase; margin-bottom:0.5rem; }
+  .stack-row { display:flex; flex-wrap:wrap; gap:0.4rem; }
+  .stack-tag { font-family:'Courier New',monospace; font-size:0.67rem; letter-spacing:0.05em;
+    color:#64748b; border:1px solid rgba(148,163,184,0.12); border-radius:4px;
+    padding:0.22rem 0.6rem; transition:all 0.15s; }
+  .stack-tag:hover { border-color:rgba(74,222,128,0.3); color:#4ade80; }
+  .stack-tag.hi { border-color:rgba(74,222,128,0.25); color:#4ade80; }
+
+  /* ── Footer ── */
+  .footer { margin-top:3rem; padding-top:1.5rem; border-top:1px solid rgba(148,163,184,0.08);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; }
+  .footer-left { color:#334155; font-family:'Courier New',monospace; font-size:0.65rem;
+    letter-spacing:0.1em; }
+  .footer-right { color:#1e293b; font-family:'Courier New',monospace; font-size:0.62rem;
+    letter-spacing:0.08em; text-transform:uppercase; }
 """

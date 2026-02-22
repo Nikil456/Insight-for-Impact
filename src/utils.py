@@ -87,21 +87,21 @@ SECTOR_TO_NAME = {
 _CHART_BASE = dict(
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(13,20,36,0.55)',
-    font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
-    title_font=dict(color='#e2e8f0', size=13, family='Courier New, monospace'),
-    margin=dict(l=12, r=12, t=44, b=12),
+    font=dict(family='Courier New, monospace', color='#94a3b8', size=12),
+    title_font=dict(color='#e2e8f0', size=14, family='Courier New, monospace'),
+    margin=dict(l=12, r=12, t=52, b=16),
     hoverlabel=dict(
         bgcolor='rgba(10,14,26,0.92)',
         bordercolor='rgba(74,222,128,0.35)',
-        font=dict(family='Courier New, monospace', color='#e2e8f0', size=11),
+        font=dict(family='Courier New, monospace', color='#e2e8f0', size=12),
     ),
 )
 _AXIS_BASE = dict(
     gridcolor='rgba(148,163,184,0.08)',
     zerolinecolor='rgba(148,163,184,0.18)',
     linecolor='rgba(148,163,184,0.15)',
-    tickfont=dict(family='Courier New, monospace', color='#64748b', size=10),
-    title_font=dict(family='Courier New, monospace', color='#94a3b8', size=11),
+    tickfont=dict(family='Courier New, monospace', color='#64748b', size=11),
+    title_font=dict(family='Courier New, monospace', color='#94a3b8', size=12),
 )
 
 
@@ -176,7 +176,7 @@ def load_sector_benchmarking():
 
 def chart_caption(text):
     st.markdown(
-        f'<p style="color:#475569; font-size:0.76rem; line-height:1.6; margin: -4px 0 10px 0; '
+        f'<p style="color:#475569; font-size:0.82rem; line-height:1.65; margin: -2px 0 12px 0; '
         f'font-family:\'Courier New\',monospace;">{text}</p>',
         unsafe_allow_html=True,
     )
@@ -184,10 +184,10 @@ def chart_caption(text):
 
 def section_header(label, title, description):
     st.markdown(f"""
-    <div style="margin-top:1.6rem; margin-bottom:0.25rem;">
-        <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.6rem;
-                  letter-spacing:0.18em; text-transform:uppercase; margin:0 0 0.2rem 0;">{label}</p>
-        <p style="color:#e2e8f0; font-size:0.95rem; font-weight:400; margin:0 0 0.35rem 0;">{title}</p>
-        <p style="color:#64748b; font-size:0.78rem; line-height:1.65; margin:0; max-width:860px;">{description}</p>
+    <div style="margin-top:2rem; margin-bottom:0.5rem;">
+        <p style="color:#4ade80; font-family:'Courier New',monospace; font-size:0.7rem;
+                  letter-spacing:0.18em; text-transform:uppercase; margin:0 0 0.35rem 0;">{label}</p>
+        <p style="color:#e2e8f0; font-size:1.5rem; font-weight:300; margin:0 0 0.45rem 0; letter-spacing:-0.01em;">{title}</p>
+        <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7; margin:0; max-width:860px;">{description}</p>
     </div>
     """, unsafe_allow_html=True)
