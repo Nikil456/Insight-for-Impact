@@ -1,4 +1,4 @@
-# H2C2 — Insight for Impact
+# Insight for Impact
 
 **Hacklytics 2026 · Databricks × United Nations**  
 [View our Devpost submission](https://devpost.com/software/insight-for-impact)
@@ -9,7 +9,7 @@ This project was built for **Hacklytics 2026** at Georgia Tech, sponsored by Dat
 
 ## Overview
 
-Every year, billions of dollars in humanitarian aid are allocated without a clear picture of where the need is greatest. Some regions receive generous funding while others — equally devastated — are barely touched. H2C2 closes that gap through four integrated tools:
+Every year, billions of dollars in humanitarian aid are allocated without a clear picture of where the need is greatest. Some regions receive generous funding while others — equally devastated — are barely touched. Insight for Impact closes that gap through four integrated tools:
 
 | Tool | Purpose |
 |---|---|
