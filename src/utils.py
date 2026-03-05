@@ -113,7 +113,6 @@ def _chart_layout(**overrides):
 
 # ── Data loaders ───────────────────────────────────────────────────────────────
 
-@st.cache_data
 def load_country_metrics():
     path = os.path.join(DATA_DIR, 'humanitarian_analysis_country_metrics.csv')
     df = pd.read_csv(path)
@@ -144,7 +143,6 @@ def load_country_metrics():
     return df
 
 
-@st.cache_data
 def load_forecast_data():
     path = os.path.join(MODELS_DIR, 'forecast_results_2026_2030.csv')
     df = pd.read_csv(path)
@@ -154,7 +152,6 @@ def load_forecast_data():
     return df
 
 
-@st.cache_data
 def load_high_risk_data():
     path = os.path.join(MODELS_DIR, 'high_neglect_risk_2026_2030.csv')
     df = pd.read_csv(path)
@@ -164,7 +161,6 @@ def load_high_risk_data():
     return df
 
 
-@st.cache_data
 def load_sector_benchmarking():
     path = os.path.join(DATA_DIR, 'humanitarian_analysis_sector_benchmarking.csv')
     df = pd.read_csv(path)
